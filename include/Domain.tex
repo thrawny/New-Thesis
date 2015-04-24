@@ -8,15 +8,50 @@ This chapter begins with an high level description of the domain. This is follow
 \caption{High level diagram of the domain.}
 \label{fig:er}
 \end{figure}
+
 \section{Description}
 The domain in which CIMS operates has the following high level entities; products, revisions, builds, test suites, test cases and trouble reports. Excluding trouble reports, these entities form a hierarchical structure as seen in figure~\ref{fig:er}. Products are at the top of this hierarchy. They represent the different software systems that are being developed at Ericsson. Products are developed iteratively, where each released iteration is called a revision. At the revision level, developers makes changes to source code, configuration, tests etc.\ which are then checked into a revision control system and subsequently built and tested. This is referred to in domain terms as a build. Each build runs a number of test suites, which in turn consist of a number test cases.
 
 As has been noted, a trouble report sits outside of the hierarchy. This entity represents a bug or defect which arrives from external (i.e.\ a customer) or internal sources. It can be mapped to different entities from products down to specific test cases. Trouble reports are handled by implementing a fix in a specific build.
 
 \section{Database schema}
+The relational database schema in use by CIMS represents the above mentioned entities in a different abstraction. Representation of these entCrowities are described in depth in the sections below.
 The schema of the relational database in CIMS is presented in figure~\ref{fig:sql}.
 
-TODO: Textual description
+\subsection{Test suite}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figure/job.png}
+\caption{Diagram of tables related to test suites using Crow's foot notation.}
+\label{fig:job}
+\end{figure}
+The top level entity of a test suite is represented by the job table. A job is used to group job\_events   . As seen in figure~\ref{fig:job}, a job belongs to a build via the build\_job\_mapping table.   
+\subsection{Build}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figure/build.png}
+\caption{Diagram of tables related to builds.}
+\label{fig:build}
+\end{figure}
+\subsection{Test case}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figure/job_event.png}
+\caption{Diagram of tables related to test cases.}
+\label{fig:job_event}
+\end{figure}
+\subsection{Deliverable}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figure/deliverable.png}
+\caption{Diagram of tables related to trouble reports.}
+\label{fig:deliverable}
+\end{figure}
+
+
+
+
+
 
 \section{Data influx}
 

@@ -1,60 +1,79 @@
 \chapter{Introduction}
-%Relational databases have been the standard for data storage in a wide range of domains and applications since the 1970s \cite{Codd}. Many attempts have been made to replace them but none have yet to succeeded in a meaningful way \cite{NoSQLDistilled}.
-Relational databases have been the standard for data storage in a wide range of domains and applications since the 1970s \cite{Codd}. Many attempts have been made to replace them but none have yet to succeeded in a meaningful way \cite{NoSQLDistilled}. Instead, a contemporary viewpoint is that no data model can and should have the purpose of describing all kinds of domains \cite{NoSQLDistilled, NoSQLSurvey}. In practise this means that trying to model all data to fit into one kind of database, relational or otherwise, is not a prudent task. This problem is known in literature as impedance mismatch \cite{ORM}. Many strategies \cite{ORM} exist for overcoming it where a more recent one is the concept of polyglot persistence \cite{NoSQLDistilled}. The argument for polyglot persistence is simple; Use the right tool for the right job. This means storing data in the form it naturally exists in its domain. One implication is that a system should potentially be made up of multiple databases, where each database is designed for specific kinds of data and to solve specific problems.
 
-Polyglot persistence is closely related to the rise in popularity of alternatives to relational databases, typically classified as NoSQL databases \cite{Catell}. NoSQL simply means "Not Relational". These databases should not be considered general purpose \cite{Catell, polyglotms} but should instead be used for solving specific problems involving specific kinds of data. A typical use case for NoSQL is storing massive scale and potentially unstructured data. This is an area where relational databases historically have a problem \cite{Catell}.
+%The outcome of a builds tests and build steps are examples of data that is produced.
+In recent years, software companies have started to generate much more data about its development processes as a result of the wide adoption of continuous integration. According to Fowler \cite{FowlerCI}, this data is crucial, since continuous integration stresses the need for transparency, information sharing and information visualization. Collecting this data also opens up companies to analyze trends about their development processes in the long term \cite{bigDataMane}. However, Schram and Anderson \cite{MySQLToNoSQL} state that having software systems that generate large amounts of data on a daily basis is not without consequence and likely introduces challenges. These include having the appropriate technical infrastructure in place to deal with data growth and supporting different use cases for operating on collected data.  
 
-\section{Problem identification}
+The software company Ericsson began adoption of continuous integration in 200X. At the company, there are two high level use cases for data collected from the continuous integration process. The first is to visualize newly created data, in real time, to developers. This is an important part of lean \cite{lean}. The second is to perform analytics, making use of historical data. This use case is of interest for the management staff as a means to quantify the effectiveness of the development process. For example to see if the proportion of successful builds increase over time. 
 
-Organizations often find themselves in a situation where the requirements of a software system have emergent properties that were not planned for. In this thesis, the emergent problem that has been identified is that of unplanned and large data growth. To manage this problem, one of the first responses is often to physically separate stale data from live data \cite{Mullins}. This in turn introduces complexity related to how databases handle historical data when the structure of the stored data is evolving. 
+%These use cases in combination with the monotonic growth of the total amount of collected data from the continuous integration process leads to a number of technical considerations when developing and evolving CIMS.
 
-In addition to increased complexity, Curino et al.\ \cite{Moon09} state that the relational model alone is too restrictive for storing and querying evolving historical data. However, polyglot persistence has shown promise in this area \cite{Moon05, Moon09, MoonPHD}. In \cite{Moon09}, a solution is described where XML is used to store historical data along with mappings between schema versions. The solution is reported to provide a unified query interface on all different schema versions of the historical data. However, XML databases are noted to scale poorly \cite{Moon09} and XML as a data format for semi-structured data is considered less than ideal \cite{JSONData}. As a comparison, the JSON format is simpler \cite{JSONData} and more widely adopted by newer NoSQL databases \cite{Catell}.
+Since the adoption of continuous integration at Ericsson, a number of software systems in support of this process has been put into use, including a web application developed internally called CIMS (Continuous Integration Management System). It has several instances, one for each of the larger software products being developed, and its main purpose is to address the first high level use case, namely to visualize data for developers. However, it is currently also used for the second use case.
 
-Given the mentioned issues regarding XML databases, other non relational storage options should be evaluated for storing evolving historical data. The emergence of the NoSQL movement has led to comparative studies \cite{Catell, NoSQLSurvey} which are relevant for this evaluation. This research has later been extended with knowledge on how to use different NoSQL databases in the same system \cite{NoSQLDistilled} and how to use both SQL and NoSQL databases in the same system \cite{MySQLToNoSQL}. However, the research field of databases lack studies investigating the practical suitability of polyglot persistence solutions with evolving historical data.
+Recently it has been observed that the amount of builds registered into CIMS is increasing steadily. At the same time the amount of test cases for each build is also increasing. The technology stack of CIMS was originally not made to scale with this kind of monotonic growth which in turn has introduced problems that impact performance, maintainability, changeability and other factors.
 
-In this thesis, a solution to archiving of historical data with evolving schemas was developed and evaluated using a design research approach. The practical suitability of a polyglot persistence solution using NoSQL as an alternative was explored in depth. The thesis was conducted at Ericsson as a response to an identified problem with an existing system that aggregates and visualizes data from software build systems and continuous integration workflows.
+Many problems with the current implementation of CIMS stem from the need to evolve the system, specifically its data model and schemas. Currently, all system data is stored in a single relational database. For evolution to take place, all data must be migrated to match new versions of the system. At current rates of stored data, these migrations can take as much as a weeks time to complete. Due to the long running migrations, the evolution of CIMS is impaired. The improvement of the continuous integration process is thereby on halt, leading to a decline in the ability of Ericsson to respond to market changes.
 
-\section{Business context}
-The existing system that proposed solutions from this study will be constructed to extend is called 'CIMS', or continuous integration management system. It was developed in order to support Ericsson in its change towards agile development, including continuous integration workflows. The system has several instances, one for each of the larger products at Ericsson. It is a web application that aggregates and visualizes data related to continuous integration, primarily regarding products, builds, tests and trouble reports.
+\section{Problem description}
 
-Recently it has been observed, in part due to the success of CIMS, that the amount of registered builds is increasing steadily. At the same time the amount of test cases for each build is also increasing, making the overall data growth nonlinear. The technology stack of CIMS was originally not made to scale with this kind of growth which in turn has introduced problems that impact performance, maintainability, changeability and other factors.
 
-Many problems with the current implementation stem from the need to evolve the system, specifically its data model and schemas. In the current implementation, all system data is stored in a single relational database. For evolution to take place, all data must be migrated to match new versions of the system. At current rates of stored data, these migrations can take as much as a weeks time to complete. However, a large portion of the data is considered stale as it is not accessed on a daily basis.
 
-A consequence of moving towards continuous integration is certainly that an organization will start to collect much more data about its software development process. The value of this data is defined by how it is used. If it is never used for anything in particular then it should just be purged on a regular basis to keep databases at a manageable size. This is however not likely to be the case. As such, a number of benefits can be observed by solving the data growth problem. Drawbacks also exist.
+%The relational database in use today is not ideal for storing the large amount of historical data that is considered to be stale. As stated earlier, this stale data is still valuable for analytical purposes. Therefore, just deleting stale data in order to enable evolution of CIMS is not a viable option.
 
-Benefits: \\
+%However, a large portion of the data is considered stale as it is not accessed on a daily basis.
+
+%Varför tas inte bara datan bort? Jo för man vill ju kunna göra Buisness analysis blabla på den.
+
+%In this thesis, a solution to archiving of historical data was developed and evaluated using a design research approach. The practical suitability of a polyglot persistence solution using NoSQL as an alternative was explored in depth. The thesis was conducted at Ericsson as a response to an identified problem with an existing system that aggregates and visualizes data from software build systems and continuous integration workflows.
+
+%Benefits: \\
 %- Offload live database. By keeping the size of the live database manageable the need for scaling up the hardware it runs on is lessened. It will also be much more performant. The possibility to continuously evolve and deploy CIMS instances is won back. Finally it will be reduced to fulfilling one main task; serving CIMS with data.
-- Hardware cost reduction.\\
-- Enable continuous integration and deployment of CIMS.\\
-- Increased performance of live database.\\
-- Make analytics possible.\\
-- Full history kept.\\
+%- Hardware cost reduction.\\
+%- Enable continuous integration and deployment of CIMS.\\
+%- Increased performance of live database.\\
+%- Make analytics possible.\\
+%- Full history kept.\\
 
-Drawbacks:\\
-- Cost of implementing solution.\\
-- Train staff in new technology or hire new staff with the skills needed.\\
-- Increased complexity of CIMS and its related systems.\\
-- New code to maintain\\
+%Drawbacks:\\
+%- Cost of implementing solution.\\
+%- Train staff in new technology or hire new staff with the skills needed.\\
+%- Increased complexity of CIMS and its related systems.\\
+%- New code to maintain\\
+
+%A consequence of moving towards continuous integration is certainly that an organization will start to collect much more data about its software development process. The value of this data is defined by how it is used. If it is never used for anything in particular then it should just be purged on a regular basis to keep databases at a manageable size. This is however not likely to be the case. As such, a number of benefits can be observed by solving the data growth problem. Drawbacks also exist.
+
 
 \section{Solution objectives}
 Together with the CIMS development team, a set of objectives that define a successful solution has been defined. The main objective is to develop an archive system that physically separates stale data from live data in order to further support the evolution of CIMS.
 
 While stale data is not accessed often, it is still useful for analytics purposes and to respond to trouble reports from customers running older versions of Ericsson products. Therefore a secondary objective is to retain as much functionality as possible in terms of queries on the archived portion of the data. The specific queries that the archive must support has been defined through discussion with the CIMS development team and the metrics team.
 
-Physical separation of live and stale data means that the storage solution for archived data must be flexible enough to handle structure variation on incoming data. If it does not then the problem of long running migrations is not solved but rather moved to the data store of the archive. As such, another objective is to effectively support structural variation of incoming data to the archive.
-
 For the combination of CIMS and the archive system to be future proof it must also be able to scale better with overall data size than CIMS currently does. This ensures that the problem is simply not pushed further into the future but rather solved in its entirety.
 
-In summation, 4 main objectives have been identified. They are as follows;\\
+In summation, 3 main objectives have been identified. They are as follows;\\
 1. Develop an archive solution that physically separates live from stale data.\\
 2. Retain a set of important queries on archived data.\\
-3. Handle structural variation on incoming data to the archive.\\
-4. Introduce long term scalability. \\
+3. Introduce long term scalability. \\
+
+%3. Handle structural variation on incoming data to the archive.\\
+%Physical separation of live and stale data means that the storage solution for archived data must be flexible enough to handle structure variation on incoming data. If it does not then the problem of long running migrations is not solved but rather moved to the data store of the archive. 
 
 \section{Document structure}
 This report is structured in the following way; In chapter~\ref{chap:background} the background and related work is described. Chapter~\ref{chap:research} presents the research approach and the chosen research method. Chapter~\ref{chap:domain} describes the domain of CIMS and the business context in more detail. In chapter~\ref{chap:design} an description is given of how the artifact addressing the stated research problem was designed and implemented.
 This is followed in chapter~\ref{chap:eval} by a description of how the artifact is evaluated. Results of this evaluation is given in chapter~\ref{chap:results}. The report is then wrapped up in chapters~\ref{chap:discussion} and  ~\ref{chap:conclusion} where results are discussed and conclusions are drawn.
+
+%Relational databases have been the standard for data storage in a wide range of domains and applications since the 1970s \cite{Codd}. Many attempts have been made to replace them but none have yet to succeeded in a meaningful way \cite{NoSQLDistilled}.
+
+%The wide adoption and success of the concept Continuous Integration has led to an  
+%Monotonic Increasing/Rel DB -> Historical Data -> Continuous Integration -> Ericsson
+
+%\section{Problem identification}
+%
+%Organizations often find themselves in a situation where the requirements of a software system have emergent properties that were not planned for. In this thesis, the emergent problem that has been identified is that of unplanned and large data growth. To manage this problem, one of the first responses is often to physically separate stale data from live data \cite{Mullins}.
+%
+%In addition to increased complexity, Curino et al.\ \cite{Moon09} state that the relational model alone is too restrictive for storing and querying evolving historical data. However, polyglot persistence has shown promise in this area \cite{Moon05, Moon09, MoonPHD}. In \cite{Moon09}, a solution is described where XML is used to store historical data along with mappings between schema versions. The solution is reported to provide a unified query interface on all different schema versions of the historical data. However, XML databases are noted to scale poorly \cite{Moon09} and XML as a data format for semi-structured data is considered less than ideal \cite{JSONData}. As a comparison, the JSON format is simpler \cite{JSONData} and more widely adopted by newer NoSQL databases \cite{Catell}.
+%
+%Given the mentioned issues regarding XML databases, other non relational storage options should be evaluated for storing evolving historical data. The emergence of the NoSQL movement has led to comparative studies \cite{Catell, NoSQLSurvey} which are relevant for this evaluation. This research has later been extended with knowledge on how to use different NoSQL databases in the same system \cite{NoSQLDistilled} and how to use both SQL and NoSQL databases in the same system \cite{MySQLToNoSQL}. However, the research field of databases lack studies investigating the practical suitability of polyglot persistence solutions with evolving historical data.
+%
 
 %\begin{figure}[h!]
 %\centering
