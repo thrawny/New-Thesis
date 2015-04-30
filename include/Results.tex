@@ -36,7 +36,7 @@ Get test tree                                & P                                
 
 \section{Scalability}
 \subsection{Disk usage}
-Disk usage after migration of live databases of different sizes are presented in figure~\ref{fig:disc}. Currently, migrations with data sets of around 100 million and 400 million job events have been performed. 
+Disk usage after migration of live databases of different sizes are presented in figure~\ref{fig:disc}. Migrations with data sets of around 2 billion and 3 billion job events have been performed.  
 \begin{figure}[h!]
 \centering
 \begin{tikzpicture}
@@ -45,16 +45,16 @@ Disk usage after migration of live databases of different sizes are presented in
     enlargelimits=0.15,
     legend style={at={(0.5,-0.2)},
       anchor=north,legend columns=-1, },
-    xlabel={Job Events (Million)},
+    xlabel={Job Events (Billion)},
     ylabel={Disk Usage (GB)},
-    symbolic x coords={100,200,400},
+    symbolic x coords={480,3300},
     xtick=data,
     nodes near coords,
     nodes near coords align={vertical},
     ]
-\addplot coordinates {(100,41) (200,1) (400,165)};
-\addplot coordinates {(100,49) (200,1) (400,225)};
-\addplot coordinates {(100,130) (200,259) (400,520)};
+\addplot coordinates {(480,1) (3300,165)};
+\addplot coordinates {(480,1) (3300,225)};
+\addplot coordinates {(480,259) (3300,1553)};
 \legend{MongoDB,ElasticSearch,MySQL}
 \end{axis}
 \end{tikzpicture}
@@ -71,16 +71,16 @@ Working set estimations are presented in figure~\ref{fig:ws}. We have done initi
     enlargelimits=0.15,
     legend style={at={(0.5,-0.2)},
       anchor=north,legend columns=-1, },
-    xlabel={Job Events (Million)},
+    xlabel={Job Events (Billion)},
     ylabel={Memory Utilization (GB)},
-    symbolic x coords={100,200,400},
+    symbolic x coords={2,3.3},
     xtick=data,
     nodes near coords,
     nodes near coords align={vertical},
     ]
-\addplot coordinates {(100,3) (200,6) (400,12)};
-\addplot coordinates {(100,1) (200,1) (400,1)};
-\addplot coordinates {(100,1) (200,1) (400,1)};
+\addplot coordinates {(2,6) (3.3,12)};
+\addplot coordinates {(2,1) (3.3,1)};
+\addplot coordinates {(2,1) (3.3,1)};
 \legend{MongoDB,ElasticSearch,MySQL}
 \end{axis}
 \end{tikzpicture}
@@ -92,4 +92,16 @@ Not yet addressed
 \subsection{Horizontal Scalability}
 Not yet addressed
 Här borde vi kunna skriva tekniska saker, men från de tekniska saker dra slutsater i Discussion som svarar på om dessa tekniker ger något business value?
-\subsubsection{ElasticSearch}
+\hiddensubsubsection{MongoDB}
+\hiddensubsubsection{Elasticsearch}
+Lessons learned while scaling with Elasticsearch, an empirical study.\\
+Compared to MongoDB, horizontal scaling with Elasticsearch demands more configuration upfront in order to get a suitable cluster. 
+In MongoDB, where the process of adding new nodes to a cluster is not limited on how the initial node is configured, the maximum number of nodes in an Elasticsearch cluster must be known on beforehand. This restriction depends on how elasticsearch is scaling in an horizontal manner. The partitioning of data when adding new nodes to a cluster is dependent on how many shards the initial node holds, as an new is added to the cluster
+the number of nodes in a cluster can never exceed the number of shards in the opening node. 
+
+\hiddensubsubsection{TokuDB}
+\section{Organizational suitability}
+This section describes the organizational suitability of the different artifacts.
+\hiddensubsection{MongoDB}
+\hiddensubsection{Elasticsearch}
+\hiddensubsection{TokuDB}

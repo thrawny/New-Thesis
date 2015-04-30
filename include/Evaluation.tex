@@ -27,7 +27,7 @@ The utility of the archive is dependant on what queries it supports. As a basis 
 %This evaluation will be done both quantitatively and qualitatively. The quantitative evaluation is done by measuring the size of the data in the archive after a migration. This value will then be compared to how much space this data took in the live database. Qualitatively, each data store's underlying ability to scale will be evaluated in means of which hardware and configuration is needed with a given total data size. Specifically, how much RAM is needed for specific data set sizes.
 
 \subsection{Disk usage}
-For the archive to scale, disk usage used must be manageable, even with billions of documents in the archive. The metric used is derived from 'Memory utilization' defined in \cite{isoInternalMetric}, memory is in this case the disk space used by the database of the archive. In order to see the archives ability for long term scalability compared to the live database, measurements is done on both migrated data in the archive and the equivalent data in the live database.              
+For the archive to scale, disk usage used must be manageable, even with billions of documents in the archive. The metric used is derived from 'Memory utilization' defined in \cite{isoInternalMetric}, memory is in this case the disk space used by the database of the archive. In order to see the archives ability for long term scalability compared to the live database, measurements is done on both migrated data in the archive and the equivalent data in the live database.               
 
 \subsection{Memory utilization}
 The used metric originates from the internal metric defined as 'Maximum memory utilization' in ISO/IEC standard TR 9126-2 \cite{isoExternalMetric}. For the specific case of database applications, this metric can be interpreted as the size of the working set, meaning the amount of data that a database must keep in RAM in order to effectively perform a specific task. The working set is dependant on the kinds of queries that are typically performed as well as the overall disc usage of the database. Comparison is made of the estimated working sets for each of the databases used for implementing the archive against the working set of the relational database used by CIMS.
@@ -37,3 +37,8 @@ For the archive to be viable in practice, insertion of new documents into the ar
 
 \subsection{Horizontal scalability}
 The ability of the archive to scale horizontally is evaluated by qualitatively investigate each data stores' capability of scalability. In this case, capability is defined as the data store's characteristics in the following areas: easiness in adding new servers to the cluster, the amount of configuration needed for starting a cluster, and the flexibility in scaling meaning how much information of the data growth that is needed on beforehand.  
+
+\section{Organizational suitability}
+The final point of evaluation is to assess how suitable a solution is from an organizational perspective. Is the CIMS development team willing to learn a new technology to turn an archive prototype into a production ready system? Is the people who perform analytics willing to learn new query languages associated with NoSQL technology?
+
+This point will be based on purely qualitative factors like the opinions of CIMS developers. We will discuss and with them and find out what the opinions are.

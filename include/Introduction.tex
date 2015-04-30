@@ -1,9 +1,13 @@
 \chapter{Introduction}
 
 %The outcome of a builds tests and build steps are examples of data that is produced.
-In recent years, software companies have started to generate much more data about its development processes as a result of the wide adoption of continuous integration. According to Fowler \cite{FowlerCI}, this data is crucial, since continuous integration stresses the need for transparency, information sharing and information visualization. Collecting this data also opens up companies to analyze trends about their development processes in the long term \cite{bigDataMane}. However, Schram and Anderson \cite{MySQLToNoSQL} state that having software systems that generate large amounts of data on a daily basis is not without consequence and likely introduces challenges. These include having the appropriate technical infrastructure in place to deal with data growth and supporting different use cases for operating on collected data.  
+In recent years, software companies have started to generate much more data about its development processes as a result of the wide adoption of continuous integration. 
 
-The software company Ericsson began adoption of continuous integration in 200X. At the company, there are two high level use cases for data collected from the continuous integration process. The first is to visualize newly created data, in real time, to developers. This is an important part of lean \cite{lean}. The second is to perform analytics, making use of historical data. This use case is of interest for the management staff as a means to quantify the effectiveness of the development process. For example to see if the proportion of successful builds increase over time. 
+Describe CI
+
+According to Fowler \cite{FowlerCI}, this data is crucial, since continuous integration stresses the need for transparency, information sharing and information visualization. Collecting this data also opens up companies to analyze trends about their development processes in the long term \cite{bigDataMane}. However, Schram and Anderson \cite{MySQLToNoSQL} state that having software systems that generate large amounts of data on a daily basis is not without consequence and likely introduces challenges. These include having the appropriate technical infrastructure and software in place to deal with data growth and also supporting different use cases for operating on collected data.  
+
+The company Ericsson began adoption of continuous integration in 200X. At the company, there are two high level use cases for data collected from the continuous integration process. The first is to visualize newly created data, in real time, to developers. This is an important part of lean \cite{lean}. The second is to perform analytics, making use of historical data. This use case is of interest for the management staff as a means to quantify the effectiveness of the development process. For example to see if the proportion of successful builds increase over time.
 
 %These use cases in combination with the monotonic growth of the total amount of collected data from the continuous integration process leads to a number of technical considerations when developing and evolving CIMS.
 
@@ -11,11 +15,21 @@ Since the adoption of continuous integration at Ericsson, a number of software s
 
 Recently it has been observed that the amount of builds registered into CIMS is increasing steadily. At the same time the amount of test cases for each build is also increasing. The technology stack of CIMS was originally not made to scale with this kind of monotonic growth which in turn has introduced problems that impact performance, maintainability, changeability and other factors.
 
+During the CIMS lifetime, the influx of data can be seen in ~\ref{fig:jeTrend}. This figure clearly shows the trend in the data inflow of CIMS. The trend is hitherto increasing, there are many factors involved in describing the origin of this trend. Shorter lead times, organization more experienced with CIMS, Agile, LEAN.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.65]{figure/jeTrend.png}
+\caption{Diagram showing the inflow of data into CIMS.}
+\label{fig:jeTrend}
+\end{figure}
+
 Many problems with the current implementation of CIMS stem from the need to evolve the system, specifically its data model and schemas. Currently, all system data is stored in a single relational database. For evolution to take place, all data must be migrated to match new versions of the system. At current rates of stored data, these migrations can take as much as a weeks time to complete. Due to the long running migrations, the evolution of CIMS is impaired. The improvement of the continuous integration process is thereby on halt, leading to a decline in the ability of Ericsson to respond to market changes.
 
 \section{Problem description}
+The context for this thesis is the intersection of continuous integration systems and data management. The focus of the research is on the management of historical data and problems related to monotonic data growth. As such, we have broken down the research problem into two parts. First, to investigate different solutions to manage historical data that grows monotonically. The second part is to justify the value of having a solution by understanding how historical data in continuous integration systems can be used and what value it brings to the organization that possess the data. 
 
-
+Both these problems were addressed using a design research approach. This approach is described in detail in chapter~\ref{chap:research} where we present the research purpose and research questions.
 
 %The relational database in use today is not ideal for storing the large amount of historical data that is considered to be stale. As stated earlier, this stale data is still valuable for analytical purposes. Therefore, just deleting stale data in order to enable evolution of CIMS is not a viable option.
 
@@ -58,8 +72,8 @@ In summation, 3 main objectives have been identified. They are as follows;\\
 %Physical separation of live and stale data means that the storage solution for archived data must be flexible enough to handle structure variation on incoming data. If it does not then the problem of long running migrations is not solved but rather moved to the data store of the archive. 
 
 \section{Document structure}
-This report is structured in the following way; In chapter~\ref{chap:background} the background and related work is described. Chapter~\ref{chap:research} presents the research approach and the chosen research method. Chapter~\ref{chap:domain} describes the domain of CIMS and the business context in more detail. In chapter~\ref{chap:design} an description is given of how the artifact addressing the stated research problem was designed and implemented.
-This is followed in chapter~\ref{chap:eval} by a description of how the artifact is evaluated. Results of this evaluation is given in chapter~\ref{chap:results}. The report is then wrapped up in chapters~\ref{chap:discussion} and  ~\ref{chap:conclusion} where results are discussed and conclusions are drawn.
+This report is structured in the following way; In chapter~\ref{chap:background} the background and related work is described. Chapter~\ref{chap:research} presents the research approach and the chosen research method. Chapter~\ref{chap:domain} describes the domain of CIMS and the business context in more detail. In chapter~\ref{chap:design} a description is given of how the artifact addressing the identified problem was designed and implemented.
+This is followed in chapter~\ref{chap:eval} by a description of how the artifact was evaluated. Results of this evaluation is given in chapter~\ref{chap:results}. The report is then wrapped up in chapters~\ref{chap:discussion} and  ~\ref{chap:conclusion} where results are discussed and conclusions are drawn.
 
 %Relational databases have been the standard for data storage in a wide range of domains and applications since the 1970s \cite{Codd}. Many attempts have been made to replace them but none have yet to succeeded in a meaningful way \cite{NoSQLDistilled}.
 

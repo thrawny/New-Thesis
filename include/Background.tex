@@ -14,7 +14,7 @@ In contrast, the fields of Big Data, NoSQL, and polyglot persistence are newer. 
 %--Stycken i denna subsektion måste refaktoreras.
 Since the emergence of the internet, big data is the phenomenon which has received the most attention by the computing industry \cite{bigDataWarehouse}. Today's popularity for big data is mainly derived from the current maturity in technologies combined with the ongoing decline in hardware costs \cite{bigDataWarehouse, bigDatabigAn}. This has led to the development of systems which enable the processing and handling of big data \cite{bigDataWarehouse}.
 
-When traditional relational databases are used, analytics can only use small data sets to create models. With big data and its technologies, analytics now has the possibility to use far more data when creating predictive models. As described in \cite{bigDatabigAn}, using traditional relational databases lets you only see the tip of the iceberg, not what is under the surface. Big data gives analytics the ability of seeing the whole iceberg, even below the surface. With the capability to gather this massive amount of data, more intelligence can be mined from the data which can be translated into business value \cite{bigDataMane}.
+When traditional relational databases are used, analytics can only use small data sets to create models. With big data and its technologies, analytics now has the possibility to use far more data when creating predictive models. As described in \cite{bigDatabigAn}, using traditional relational databases lets you only see the tip of the iceberg, not what is under the surface. Big data gives analytics the ability of seeing the whole iceberg, even below the surface. With the capability to gather this massive amount of data, more intelligence can be mined from the data which can, if done right, be translated into business value \cite{bigDataMane}.
 
 There are three characteristics that describes big data; volume, velocity and variety. Volume is the quantity of data. As an example, Walmart gathers more than 2.5 petabytes of customer transaction data per hour \cite{bigDataMane}. The velocity of data gathering should be nearly real-time, which enables the organization to be agile. Data is gathered from different sources or has different structures which gives more data points to correlate.
 
@@ -35,28 +35,28 @@ The scope of \cite{Catell} covers SQL and NoSQL variants that address scalabilit
 
 Four different categories of NoSQL data stores mentioned in \cite{Catell} and \cite{NoSQLDistilled} are described in the sections below.
 
-\subsubsection{Key value stores}
+\hiddensubsubsection{Key value stores}
 
 Key value stores uses a key-value index as structure, each value corresponds to a key which is used for lookups and deletes for that value\cite{Catell}. The data model used is a map or dictionary, which is simpler compared to a relational table and gives a faster query speed compared to a relational database \cite{NoSQLSurvey}. 
 
-\subsubsection{Document stores}
+\hiddensubsubsection{Document stores}
 
 Compared with the key value store where the key is used for lookups, a document store uses a query based on the structure of the document combined with certain attributes like Id in order to retrieve the data. The structure of the documents in a document store does not need to be defined in forehand and the structure of the documents does not need to be homogeneous, thereby the document store is said to be schemaless \cite{NoSQLDistilled}. The data structure of a document is a hierarchical tree which can contain lists, nested objects and maps \cite{Catell, NoSQLDistilled}. Due to the freedom in a document's structure and depending on which document store used, there exists different techniques to model relations between objects in a document store, different techniques offer different benefits in form of performance, size on disk etc. 
 
-\subsubsection{Graph Databases}
+\hiddensubsubsection{Graph Databases}
 
 Many NoSQL databases mentioned in \cite{Catell} consists of large blobs with low coupling, graph databases is the opposite, graph databases consists of small records with high and complex coupling. A graph is a data structure containing nodes that are connected with arcs\cite{NoSQLDistilled}. This highly interconnected structure gives the ability to query information based on the relations between nodes, for instance "find the parts included in product X that were manufactured by Y and shipped by Z". The relational databases would model these relations with foreign keys, but when querying complex relationships, the joins required becomes heavily performance demanding. The querying and traversal between the relationships becomes efficient and cheap in graph databases compared to the relational databases \cite{NoSQLDistilled}.
 
-\subsubsection{Column-Family Stores}
+\hiddensubsubsection{Column-Family Stores}
 Categorized as extensible document stores by \cite{Catell}. 
 
 %---------------------------------------------
 
 \subsection{Polyglot persistence}
 
-There is a consensus in contemporary database literature that relational databases are not going to go away anytime soon \cite{Catell, NoSQLDistilled, NoSQLSurvey}. They are however, no longer the one and only option for every problem. Instead, a contemporary viewpoint is that no data model can and should have the purpose of describing all kinds of domains \cite{NoSQLDistilled, NoSQLSurvey}. In practise this means that trying to model all data to fit into one kind of database, relational or otherwise, is not a prudent task. This problem is known in literature as impedance mismatch \cite{ORM}. Many strategies \cite{ORM} exist for overcoming it where a more recent one is the concept of polyglot persistence \cite{NoSQLDistilled}. 
+There is a consensus in contemporary database literature that relational databases are not going to go away anytime soon \cite{Catell, NoSQLDistilled, NoSQLSurvey}. They are, however, no longer the one and only option for every problem. Instead, a contemporary viewpoint is that no data model can and should have the purpose of describing all kinds of domains \cite{NoSQLDistilled, NoSQLSurvey}. In practise this means that trying to model all data to fit into one kind of database, relational or otherwise, is not a prudent task. This problem is known in literature as impedance mismatch \cite{ORM}. Many strategies \cite{ORM} exist for overcoming it where a more recent one is the concept of polyglot persistence \cite{NoSQLDistilled}. 
 
-The word polyglot means something that is made up of several languages. In the field of software this is often meant to mean a system that is built with several different programming languages. Similarly, polyglot persistence means that a system leverages several different databases. Rarely does all the data of a software system match nicely with one kind of data model. So instead of using the same data model for everything, databases with different data models and traits are used for specific kinds of data within a system. That is in essence, the idea behind polyglot persistence. Figure~\ref{fig:polyglot} shows a design example of an e-commerce platform where different types of data exist along with database choices that are well suited to store this data.
+The word polyglot means something that is made up of several languages. In the field of software this is often meant to mean a system that is built with several different programming languages. Similarly, polyglot persistence means that a system leverages several different databases. Rarely does all the data of a software system match nicely with one kind of data model. So instead of using the same data model for everything, databases with different data models and traits are used for specific kinds of data within a system. That is in essence, the idea behind polyglot persistence. To illustrate, figure~\ref{fig:polyglot} shows a design example of an e-commerce platform where different types of data exist along with database choices that are well suited to store this data.
 
 %The argument for polyglot persistence is simple; Use the right tool for the right job. This means storing data in the form it naturally exists in its domain. One implication is that a system should potentially be made up of multiple databases, where each database is designed for specific kinds of data and to solve specific problems.
 
