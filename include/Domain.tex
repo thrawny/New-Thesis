@@ -25,7 +25,7 @@ The schema of the relational database in CIMS is presented in figure~\ref{fig:sq
 \caption{Diagram of tables related to test suites.}
 \label{fig:job}
 \end{figure}
-The top level entity of a test suite is represented by the job table. A job is used to group related job events and thereby form a test suite. A test suite is run within a build, as seen in figure~\ref{fig:job}, a job belongs to a build via the 'build job mapping' table.
+The top level entity of a test suite is represented by the job table. A job is used to group related job events and thereby form a test suite. A test suite is run within a build, as seen in figure~\ref{fig:job}, a job belongs to a build via the 'build job mapping' table. 
 \subsection{Build}
 \begin{figure}[h!]
 \centering
@@ -110,7 +110,7 @@ This query should retrieve the build that a root test suite belongs to.
 Query in CIMS: Get deliverables for build \\
 Example input: $CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139$ \\
 Example output: \\
-Given a unique build id, return a list of deliverables valid for that build. In domain terms this means retrieving all trouble reports that affects the build.
+Given a unique build id, return a list of deliverables valid for that build. In domain terms this means retrieving all trouble reports that affect the build.
 
 \hiddensubsection{Get trouble report fixes for build}
 Query in CIMS: Get deliverables for build \\
@@ -169,7 +169,7 @@ This query should return the history of a test case, identified by its name, fil
 
 \hiddensubsection{Get test tree}
 Query in CIMS: Get job tree by id \\
-Example input: 1234567\\
+Example input: $1234567$\\
 Example output: \\
 In the relational data model of CIMS, a job represents a root test suite for a specific build. I.e a test suite with no parent. This query should, given a unique id of such a job, return the hierarchical representation of that job.
 

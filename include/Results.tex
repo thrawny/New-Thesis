@@ -62,7 +62,10 @@ Disk usage after migration of live databases of different sizes are presented in
 \label{fig:disc}
 \end{figure}
 \subsection{Memory utilization}
+\hiddensubsubsection{Insertion}
+\hiddensubsubsection{Query}
 Working set estimations are presented in figure~\ref{fig:ws}. We have done initial estimations of the working set for MongoDB with manual testing. As long as custom indexes defined on the job event collection fit in RAM, the database is stable and can respond to queries where indexes can be utilized. The working set estimation is the summed size of the custom indexes.
+
 \begin{figure}[h!]
 \centering
 \begin{tikzpicture}
@@ -94,10 +97,9 @@ Not yet addressed
 Här borde vi kunna skriva tekniska saker, men från de tekniska saker dra slutsater i Discussion som svarar på om dessa tekniker ger något business value?
 \hiddensubsubsection{MongoDB}
 \hiddensubsubsection{Elasticsearch}
-Lessons learned while scaling with Elasticsearch, an empirical study.\\
+"Lessons learned while scaling with Elasticsearch, future work can be to test with more nodes".\\
 Compared to MongoDB, horizontal scaling with Elasticsearch demands more configuration upfront in order to get a suitable cluster. 
-In MongoDB, where the process of adding new nodes to a cluster is not limited on how the initial node is configured, the maximum number of nodes in an Elasticsearch cluster must be known on beforehand. This restriction depends on how elasticsearch is scaling in an horizontal manner. The partitioning of data when adding new nodes to a cluster is dependent on how many shards the initial node holds, as an new is added to the cluster
-the number of nodes in a cluster can never exceed the number of shards in the opening node. 
+In MongoDB, where the process of adding new nodes to a cluster is not limited on how the initial node is configured, the maximum number of nodes in an Elasticsearch cluster must be known on beforehand. This restriction depends on how Elasticsearch is scaling in an horizontal manner. The partitioning of data when adding new nodes to a cluster is dependent on how many shards the initial node holds, as an new node is added to the cluster it overtakes shards from the already existing nodes.
 
 \hiddensubsubsection{TokuDB}
 \section{Organizational suitability}
