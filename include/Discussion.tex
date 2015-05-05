@@ -1,18 +1,17 @@
 \chapter{Discussion}
 \label{chap:discussion}
-In this chapter we discuss the evaluation results of the developed artifacts and relate these to our research questions.
 
-\section{RQ1 - Challenges of monotonic data growth}
-- 
+\section{Data separation}
+Overall, the process of moving data from CIMS into the an archive database was pain free. Both mongodb and elasticsearch proved capable of quickly inserting a CIMS instance with several years worth of data. 
 
+\section{Query support}
+Translating queries to the query languages of mongodb and elasticsearch was a challenge.
 
-\section{RQ2 - Management of historical data}
-The concept of polyglot persistence and the literature on this subject provided much benefit in terms of addressing the problem at hand. As a solution to this problem, the goal of physically separating the complete data set into two parts, one for live data and one for historical data, was the first step to designing a system that is much more efficient. Achieving this goal enables many things. 
+\subsection{mongodb}
 
-- Keeping live data in a relational database is highly beneficial if the size of live data is small. \\
-- Accessing historical data has no effect on performance of the database with the live data. \\
-- Possibility to have different solutions for live and historical data. \\
+\subsection{elasticsearch}
+Elasticsearch has a very rich query system where the same query can be represented in many different ways. Chosing the correct way to represent a query can impact results in terms of performance and dependability of results. 
 
+\section{Scalability}
 
-
-\section{RQ3 - Value of a solution}
+\section{Organizational suitability}
