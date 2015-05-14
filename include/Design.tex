@@ -5,7 +5,7 @@
 
 This chapter describes the design of the artifact and the constructed prototypes.
 
-Through the review of related work, establishment has been made that non relational databases are appropriate as a part of a solution to the identified problem of this thesis. However, it has also been suggested \cite{NoSQLSurvey} that the introduction of non relational storage should not replace current relational databases, but should instead work as a complement. We argue that a polyglot persistence solution is a natural approach to the identified problem. Implementing such a solution would then address objective 1, namely to physically separate live from stale data. Before implementation, a decision has to be made on what types of databases should be used as the underlying storage for the archive. If the only objective was data separation then the simplest choice would be to completely duplicate system data in its current form to a similar database. However, this does not take into account other objectives and would likely not solve the underlying problem. 
+Through the review of related work, establishment has been made that non relational databases might be appropriate as a part of a solution to the identified problem of this thesis. However, it has also been suggested \cite{NoSQLSurvey} that the introduction of non relational storage should not replace current relational databases, but should instead work as a complement. We argue that a polyglot persistence solution is a natural approach to the identified problem. Implementing such a solution would then address objective 1, namely to physically separate live from stale data. Before implementation, a decision has to be made on what types of databases should be used as the underlying storage for the archive. If the only objective was data separation then the simplest choice would be to completely duplicate system data in its current form to a similar database. However, this does not take into account other objectives and would likely not solve the underlying problem. 
 
 When selecting what databases to use we need address the issue of long running schema migrations. One way this could be addressed is by using a database with a flexible schema, capable of handling heterogeneous data. Said database should also have query capabilities that allow us to effectively address objective 2; the retainment of important queries.
 
@@ -19,8 +19,8 @@ The main motivation for choosing MongoDB as a candidate is its flexible data mod
 \section{Elasticsearch}
 Elasticsearch is classified as a search engine, but has some similarities to MongoDB, such as its data model and the ability to scale horizontally. The difference is mainly in query capabilities, which in are optimized for full text search. However, supporting full text search comes at a price of higher demands on hardware. We believe this to be an interesting trade-off to consider, and a comparison between MongoDB and Elasticsearch should yield useful practical information on how to proceed with the development of an archive solution after the study has been conducted.
 
-\section{Data model for non-relational archive}
-With the domain description as a basis, the schema of the relational database in CIMS should be transformed to suit the strengths of the chosen NoSQL databases. A level of denormalization is prudent since any relationship between collections in a document store has to be implemented in application logic. However, no relationships at all would not be suitable for the types of queries that need to be supported. As such, the data model of the archive needs to be well designed. Given the use of document-stores and their data model, one natural change is to convert one to many relationships into lists of embedded documents. Another change is to denormalize all one to one relationships.
+\section{Data model for non-relational archive} \label{nosqlmodel}
+With the domain description as a basis, the schema of the relational database in CIMS should be transformed to suit the strengths of the chosen NoSQL databases. A level of denormalization is prudent since any relationship between collections in a document-store has to be implemented in application logic. However, no relationships at all would not be suitable for the types of queries that need to be supported. As such, the data model of the archive needs to be well designed. Given the use of document-stores and their data model, one natural change is to convert one to many relationships into lists of embedded documents. Another change is to denormalize all one to one relationships.
 
 To illustrate the transformation process, we present a diagram in figure~\ref{fig:nosql} describing a proposed non relational schema for the archive. This can be compared to the original relational schema in figure~\ref{fig:sql}.
 
@@ -34,7 +34,7 @@ To illustrate the transformation process, we present a diagram in figure~\ref{fi
 \section{TokuDB}
 TokuDB is a storage engine for MySQL that aims to bring MySQL up to par with NoSQL databases in terms of scalability and flexibility, while still retaining the ACID transactions that are common in relational databases. It does this by addressing many of weaknesses of MySQL and its most widely used storage engine, InnoDB. A much higher compression rate is achieved by leveraging fractal tree indexing. Schema migrations can be performed without locking the table.
 
-An archive prototype will be developed using MySQL with TokuDB as the storage engine. This will provide a good contrast to the NoSQL based prototypes and has potential benefits that the NoSQL approach does not have. For example, the same schemas can be used for CIMS and the archive, making data transfer seamless between the two. However, the effectiveness of this solution is highly dependant on whether schema migrations are manageable with large data sets.
+An archive prototype will be developed using MySQL with TokuDB as the storage engine. This will provide a contrast to the NoSQL based prototypes and has potential benefits that the NoSQL approach does not have. For example, the same schemas can be used for CIMS and the archive, making data transfer seamless between the two. However, the effectiveness of this solution is highly dependant on whether schema migrations are manageable with large data sets.
 
 \section{Software components}
 A set of software components should be developed in order to effectively support the databases used for the archive prototypes. These components serve as glue code between the relational database of CIMS and the database of the archive. 
@@ -42,10 +42,230 @@ A set of software components should be developed in order to effectively support
 Data needs to be extracted from the live relational database before it can be transformed and migrated elsewhere. This component should group data into chunks that makes sense to migrate as a unit. 
 
 \subsection{Data transformation tool}
-After data has been extracted it is transformed to fit the new schema in figure~\ref{fig:nosql}. In order to transform the relational data to an viable  non-relational structure, the data needs to be denormalized. This is made to avoid expensive application-side joins that incorporates multiple roundtrips to the database. As seen in figure~\ref{fig:nosql}, the tables corresponding to a 'job\_event' and an 'event' has been grouped into a single document. The transformed data is then ready for insertion into the archive. 
+After data has been extracted, it is transformed to fit the new schema in figure~\ref{fig:nosql}. In order to transform the relational data to a viable non-relational structure, the data needs to be denormalized. This is made to avoid expensive application-side joins that incorporate multiple round trips to the database. As seen in figure~\ref{fig:nosql}, the tables corresponding to a 'job\_event' and an 'event' has been grouped into a single document. Once data has been transformed it is ready for insertion into the archive. 
 
 \subsection{Archive API}
+\label{sec:archiveapi}
 To demonstrate the capability of the archive to respond to queries, an API should be developed that capture these queries. 
+
+For Elasticsearch, MonogDB, and most NoSQL databases, operations on data can be made via a HTTP REST API, where operations are defined by JSON objects.
+
+The set of important queries defined in section~\ref{sec:usecases} can be translated as follows for the different archive databases.
+
+\hiddensubsubsection{Get build}
+\label{q:getbuildEs}
+Query for Elasticsearch: \\
+\begin{verbatim}
+POST http://localhost:18843/build/_search
+{ 
+    "query" : {
+        "ids" : { 
+             "values" : ["CXS101289_10_LLVCORA"]
+        }
+    }
+}
+\end{verbatim}
+
+Query for MongoDB:
+\begin{verbatim}
+db.build.findOne( { "_id": "some_id" } )
+\end{verbatim}
+This query is simply used to uniquely identify a build.
+
+
+\hiddensubsubsection{Get build information}
+\label{q:getbuildEs}
+Query for Elasticsearch:
+\begin{verbatim}
+POST http://localhost:18843/build/_search
+{ 
+    "query" : {
+        "ids" : { 
+            "values" : ["CXS101289_10_LLVCORA"]
+        }
+    },
+    "fields" :  ["product_name","product_revision",
+                    "verdict","start","end"]
+}
+\end{verbatim}
+
+Query for MongoDB:
+\begin{verbatim}
+db.build.findOne( 
+    { "_id": "some_id" }, 
+    { "product_name": 1, "product_revision": 1, 
+      "verdict": 1, "start": 1, "end": 1 } 
+)
+\end{verbatim}
+
+\hiddensubsubsection{Get build for root test suite}
+Query for Elasticsearch:\\
+This query requires two round trips to Elasticsearch, first to get the id of the job's build, latter to get information about that build.\\
+\begin{verbatim}
+POST http://localhost:18843/job/_search
+{ 
+    "query" : {
+        "ids" : { 
+            "values" : ["1234"]
+        }
+    },
+    "fields" :  ["build_job_mapping_build_id"]
+}
+\end{verbatim}
+The result from this query is, which is an build id is then used as parameter to the "Get build information" query described in \ref{q:getbuildinfoEs}. 
+
+
+Query for MongoDB:
+\begin{verbatim}
+build_id = db.job.findOne( 
+    { "job_name": "some_name" }, 
+    { "build_job_mapping_build_id": 1 } 
+)
+db.build.findOne( { "_id": build_id } )
+\end{verbatim}
+
+
+%\hiddensubsubsection{Get trouble reports for build}
+
+%\hiddensubsubsection{Get trouble report fixes for build}
+
+%\hiddensubsubsection{Get trouble reports for product and revision}
+
+%\hiddensubsubsection{Get test suite children}
+
+%\hiddensubsubsection{Get test case in build}
+
+%\hiddensubsubsection{Get test suite in build}
+
+\hiddensubsubsection{Get root test suite for test case/test suite}
+\label{q:getroottsEs}
+Query for Elasticsearch:\\
+This query requires two round trips to Elasticsearch, first to get the job event's job name, this name is then used to retrieve information about that job.
+\begin{verbatim}
+POST http://localhost:18843/job_event/_search
+{ 
+    "query" : {
+        "ids" : { 
+            "values" : ["fff70f3a-c69e-44c1-b9f5-7e5ae5a59610"]
+        }
+    },
+    "fields" :  ["job_name"]
+}
+
+POST http://localhost:18843/job/_search
+{ 
+    "query" : {
+        "ids" : { 
+            "values" : ["result from previous query"]
+        }
+    }
+}
+\end{verbatim}
+
+Query for MongoDB:
+\begin{verbatim}
+job_name = db.job_event.findOne( 
+    { "_id": "some_id" }, 
+    { "job_name": 1 } 
+)
+db.job.findOne( { "_id": job_name } )
+\end{verbatim}
+
+\hiddensubsubsection{Get test case by name}
+Query for Elasticsearch:
+\label{q:gettcbynameEs}
+\begin{verbatim}
+POST http://localhost:18843/job_event/_search
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "term" : {
+                            "name" : "some_name"
+                }
+            }
+        }
+    }
+}
+\end{verbatim}
+
+Query for MongoDB:
+\begin{verbatim}
+db.job_event.find( { "name": "some_name" } )
+\end{verbatim}
+
+%\hiddensubsubsection{Get test suite for test case}
+
+\hiddensubsubsection{Get test case history}
+Query for Elasticsearch:
+\begin{verbatim}
+job_events = POST http://localhost:18843/job_event/_search
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "term" : {
+                            "name" : "some_name"
+                }
+            }
+        }
+    }
+}
+job_names = job_event.job_name FOR job_event IN job_events
+jobs = POST http://localhost:18843/job/_search
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "terms" : {
+                            "job_name" : "job_names"
+                }
+            }
+        }
+    }
+}
+root_job_event_ids = job.root_job_event_id FOR job in jobs
+root_job_events = POST http://localhost:18843/job_event/_search
+{ 
+    "query" : {
+        "ids" : { 
+            "values" : ["root_job_event_ids"]
+        }
+    }
+}
+build_ids = job.build_job_mapping_build_id FOR job in jobs
+http://localhost:18843/build/_search
+{ 
+    "query" : {
+        "ids" : { 
+            "values" : ["build_ids"]
+        }
+    }
+}
+
+
+\end{verbatim}
+
+Query for MongoDB:
+\begin{verbatim}
+job_events = db.job_event.find( { "name": "some_name" } )
+job_names = job_event.job_name FOR job_event IN job_events // list comprehension
+
+jobs = db.job.find( { "job_name": { $in: job_names } } )
+root_job_event_ids = job.root_jobevent_id FOR job IN jobs
+root_job_events = db.job.find( { "_id": { $in: root_job_event_ids } } )
+
+build_ids = job.build_job_mapping_build_id FOR job IN jobs
+builds = db.build.find( { "_id": { $in: build_ids } } )
+
+(Build result dictionary with list of job events, jobs, root job events and builds)
+ 
+\end{verbatim}
+
+%\hiddensubsubsection{Get test tree}
+
+
+\hiddensubsubsection{Get all build data}
 
 %\subsection{Schema evolution tool}
 %To effectively support schema evolution, two features should to be implemented. The first is to effectively extract and transform data from different schemas of the relational database in CIMS. The second is to respond to queries that span multiple schema versions. These features will likely be extensions to the previously defined components.

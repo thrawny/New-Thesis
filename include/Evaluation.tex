@@ -3,25 +3,19 @@
 
 In this chapter the different evaluation criteria of the artifact are described and motivated. The artifact is evaluated by metrics that capture the solution objectives and provide relevant data used to address research questions.
 
-%Metrics som rör organisationen skall vi mäta med med gqm \cite{gqm}.   
-%Metrics som performance, size on disk, memory consumption skall vi använda oss av ISO standarderna.
- 
 \section{Data separation}
-How well the separation of data works will be evaluated qualitatively by reasoning about the general process of migrating data from the live database in CIMS to the database of the archive. This process is dependent on the effectiveness of the software components that are constructed to support the database of the archive. It is also dependent on how the archive database is configured and how suitable this database is for the task.
+How well the separation of data works will be evaluated qualitatively by reasoning about the general process of migrating data from the live database in CIMS to the database of the archive. This process is dependent on the effectiveness of the software components that are constructed to support the database of the archive.
+A crucial part of this process is the transformation and denormalization of relational data. This transformation is the foundation for how queries can be written against the archive. Depending on how the data is modeled in the archive, operations on that data will have different complexites. The process of separation is also dependent on how the archive database is configured and how suitable it is for the task. 
 
-The basis for the evaluation is to migrate data sets of different sizes, using data from an existing instance of CIMS. When migration is complete, it is possible to proceed with evaluation points that require data to be present in the archive.  
-
-%This section describes the evaluation of the artifacts' ability to address solution objective 1, namely to develop an archive solution that physically separates live from stale data.
-
-%The measurements are made with data originated from the real world in order to ensure that the artifact is tested in it's real environment.
+The basis for the evaluation is to migrate data sets of different sizes, using data from an existing instance of CIMS. This data will also be extended with generated dummy data in order to get a data set that is closer in size to what an archive would be after being put into production given the current data growth trends. When migration is complete, it is possible to proceed with evaluation points that require data to be present in the archive.  
 
 \section{Query support}
-The utility of the archive is dependant on what queries it supports. As a basis for evaluation, the set of important queries defined previously in section~\ref{sec:usecases} is used. Evaluation is done by comparing this set to the set of queries that could in fact be implemented in the archive prototypes, using the 'Functional implementation completeness' metric from \cite{isoExternalMetric}.
+The utility of the archive is dependant on what queries it supports and how complex these queries are. As a basis for evaluation, the set of important queries defined previously in section~\ref{sec:usecases} is used. Evaluation is done by comparing this set to the set of queries implemented in the archive prototypes which are previously described in section~\ref{sec:archiveapi}. Comparison is made on the difference in the queries complexity. 
 
 %\section{Schema evolution}
 %The ability of the archive to handle schema evolution is evaluated by introducing realistic schema variation on incoming data to the archive. These changes are defined in collaboration with the CIMS development team and should capture the planned evolution of the database schema in CIMS.
 %
-%This evaluation is qualitative and is based on the "Adaptability of data structures" metric defined in \cite{isoInternalMetric}.   
+%This evaluation is qualitative and is based on the "Adaptability of data structures" metric defined in \cite{isoInternalMetric}.
 
 \section{Scalability}
 %This evaluation will be done both quantitatively and qualitatively. The quantitative evaluation is done by measuring the size of the data in the archive after a migration. This value will then be compared to how much space this data took in the live database. Qualitatively, each data store's underlying ability to scale will be evaluated in means of which hardware and configuration is needed with a given total data size. Specifically, how much RAM is needed for specific data set sizes.
@@ -36,9 +30,9 @@ The used metric originates from the internal metric defined as 'Maximum memory u
 For the archive to be viable in practice, insertion of new documents into the archive must be efficient. Even with large number of documents already in the archive, the insertions must be made in adequate time. Measurements is be done on insertions of data originated from the live database, the metric will be applied on artifacts containing different amount of data.
 
 \subsection{Horizontal scalability}
-The ability of the archive to scale horizontally is evaluated by qualitatively investigate each data stores' capability of scalability. In this case, capability is defined as the data store's characteristics in the following areas: easiness in adding new servers to the cluster, the amount of configuration needed for starting a cluster, and the flexibility in scaling meaning how much information of the data growth that is needed on beforehand.  
+The ability of the archive to scale horizontally is evaluated by qualitatively investigate each data stores' capability of scalability. In this case, capability is defined as the data store's characteristics in the following areas: easiness in adding new servers to the cluster, the amount of configuration needed for starting a cluster, and the flexibility in scaling meaning how much information of the data growth that is needed on beforehand.   
 
 \section{Organizational suitability}
-The final point of evaluation is to assess how suitable a solution is from an organizational perspective. Is the CIMS development team willing to learn a new technology to turn an archive prototype into a production ready system? Is the people who perform analytics willing to learn new query languages associated with NoSQL technology?
+The final point of evaluation is to assess how suitable a solution is from an organizational perspective. There are multiple factors to consider when evaluating the archives' suitability in the organization. Which roles at Ericsson are going to use the archive and how will they use it? What business value can be mined from the data in the archive? What obstacles exists when having both relational and non-relational databases in the same system and how expensive are these obstacles to overcome? Is the CIMS development team willing to learn a new technology to turn an archive prototype into a production ready system? Is the people who perform analytics willing to learn new query languages associated with NoSQL technology? How much overhead is required for maintaining two different data stores in CIMS? How suitable is the different prototypes in the current IT environment? Can the organization make use of all this data and be able to get something of value out from it?    
 
 This point will be based on purely qualitative factors like the opinions of CIMS developers. We will discuss and with them and find out what the opinions are.

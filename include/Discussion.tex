@@ -6,10 +6,10 @@ Overall, the process of moving data from CIMS into the an archive database was p
 
 \section{Query support}
 Translating queries to the query languages of mongodb and elasticsearch was a challenge.
+Fewer joins are made with the non-relational model, which is good because joins in an distributed environment is really expensive \cite{some source}. Joins made on application is better for the database, because the "join" is made on the webserver and not in the database server.
+\hiddensubsection{mongodb}
 
-\subsection{mongodb}
-
-\subsection{elasticsearch}
+\hiddensubsection{elasticsearch}
 Elasticsearch has a very rich query system where the same query can be represented in many different ways. Chosing the correct way to represent a query can impact results in terms of performance and dependability of results. 
 
 \section{Scalability}
