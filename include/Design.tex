@@ -5,7 +5,7 @@
 
 This chapter describes the design of the artifact and the constructed prototypes.
 
-Through the review of related work, establishment has been made that non relational databases might be appropriate as a part of a solution to the identified problem of this thesis. However, it has also been suggested \cite{NoSQLSurvey} that the introduction of non relational storage should not replace current relational databases, but should instead work as a complement. We argue that a polyglot persistence solution is a natural approach to the identified problem. Implementing such a solution would then address objective 1, namely to physically separate live from stale data. Before implementation, a decision has to be made on what types of databases should be used as the underlying storage for the archive. If the only objective was data separation then the simplest choice would be to completely duplicate system data in its current form to a similar database. However, this does not take into account other objectives and would likely not solve the underlying problem. 
+Through the review of related work, it has been established that non relational databases might be appropriate as a part of a solution to the identified problem of this thesis. However, it has also been suggested \cite{NoSQLSurvey} that the introduction of non relational storage should not replace current relational databases, but should instead work as a complement to them. We argue that a polyglot persistence solution is a natural approach to the identified problem. Implementing such a solution would then address objective 1, namely to physically separate live from stale data. Before implementation, a decision has to be made on what types of databases should be used as the underlying storage for the archive. If the only objective was data separation then the simplest choice would be to completely duplicate system data in its current form to a similar database. However, this does not take into account other objectives and would likely not solve the underlying problem. 
 
 When selecting what databases to use we need address the issue of long running schema migrations. One way this could be addressed is by using a database with a flexible schema, capable of handling heterogeneous data. Said database should also have query capabilities that allow us to effectively address objective 2; the retainment of important queries.
 
@@ -14,10 +14,10 @@ In order for the archive system to scale naturally with the current level of dat
 Two different NoSQL databases and one relational database were selected to be used for the implementation of archive prototypes. They are described in more detail in the following sections.
 
 \section{MongoDB}
-The main motivation for choosing MongoDB as a candidate is its flexible data model along with custom indexes and extensive query capabilities \cite{Catell}. As a comparison, a key-value store would be to constricting for the types of queries that need to be supported by the archive as seen in table~\ref{tab:queries}. A document-store has, at least in theory, the right mix between data model flexibility and query capabilities. Our intent with this design choice is to evaluate the suitability of document-stores in general as a means to solve the identified problem. 
+The main motivation for choosing MongoDB as a candidate is its flexible data model along with custom indexes and extensive query capabilities \cite{Catell}. As a comparison, a key-value store would be to constricting for the types of queries that need to be supported by the archive as seen described in section~\ref{sec:usecases}. A document-store has, at least in theory, the right mix between data model flexibility and query capabilities. Our intent with this design choice is to evaluate the suitability of document-stores in general as a means to solve the identified problem. 
 
 \section{Elasticsearch}
-Elasticsearch is classified as a search engine, but has some similarities to MongoDB, such as its data model and the ability to scale horizontally. The difference is mainly in query capabilities, which in are optimized for full text search. However, supporting full text search comes at a price of higher demands on hardware. We believe this to be an interesting trade-off to consider, and a comparison between MongoDB and Elasticsearch should yield useful practical information on how to proceed with the development of an archive solution after the study has been conducted.
+Elasticsearch is classified as a search engine, but has some similarities to MongoDB, such as its data model and the ability to scale horizontally. The difference is mainly in query capabilities, which in optimized for full text search. However, supporting full text search comes at a price of higher demands on hardware. We believe this to be an interesting trade-off to consider, and a comparison between MongoDB and Elasticsearch should yield useful practical information on how to proceed with the development of an archive solution after the study has been conducted.
 
 \section{Data model for non-relational archive} \label{nosqlmodel}
 With the domain description as a basis, the schema of the relational database in CIMS should be transformed to suit the strengths of the chosen NoSQL databases. A level of denormalization is prudent since any relationship between collections in a document-store has to be implemented in application logic. However, no relationships at all would not be suitable for the types of queries that need to be supported. As such, the data model of the archive needs to be well designed. Given the use of document-stores and their data model, one natural change is to convert one to many relationships into lists of embedded documents. Another change is to denormalize all one to one relationships.
@@ -258,7 +258,8 @@ root_job_events = db.job.find( { "_id": { $in: root_job_event_ids } } )
 build_ids = job.build_job_mapping_build_id FOR job IN jobs
 builds = db.build.find( { "_id": { $in: build_ids } } )
 
-(Build result dictionary with list of job events, jobs, root job events and builds)
+(Build result dictionary with list of 
+job events, jobs, root job events and builds)
  
 \end{verbatim}
 

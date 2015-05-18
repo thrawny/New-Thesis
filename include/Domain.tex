@@ -1,7 +1,7 @@
 \chapter{Domain}
 \label{chap:domain}
 
-This chapter begins with an high level description of the domain. This is followed by a description of the schema in the relational database of CIMS and its use cases.
+This chapter begins with an high level description of the domain. This is followed by a description of the schema in the relational database of CIMS and a depiction of the data influx rate in CIMS. The chapter ends with potential uses cases for an archive solution and the database queries needed for those use cases.
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.5]{figure/er_diagram.png}
@@ -10,21 +10,22 @@ This chapter begins with an high level description of the domain. This is follow
 \end{figure}
 
 \section{High level schema}
-The domain in which CIMS operates has the following high level entities; products, revisions, builds, test suites, test cases and trouble reports. Excluding trouble reports, these entities form a hierarchical structure as seen in figure~\ref{fig:er}. Products are at the top of this hierarchy. They represent the different software systems that are being developed at Ericsson. Products are developed iteratively, where each released iteration is called a revision. At the revision level, developers makes changes to source code, configuration, tests etc.\ which are then checked into a revision control system and subsequently built and tested. This is referred to in domain terms as a build. Each build runs a number of test suites, which in turn consist of a number test cases.
+For the feasibility of this study, the domain of CIMS has been narrowed to some key entities, which are the following; products, revisions, builds, test suites, test cases and trouble reports. Excluding trouble reports, these entities form a hierarchical structure as seen in figure~\ref{fig:er}. Products are at the top of this hierarchy. They represent the different software systems that are being developed at Ericsson. Products are developed iteratively, where each released iteration is called a revision. At the revision level, developers makes changes to source code, configuration, tests etc.\ which are then checked into a revision control system and subsequently built and tested. This is referred to in domain terms as a build. Each build runs a number of test suites, which in turn consist of a number test cases.
 
 As has been noted, a trouble report sits outside of the hierarchy. This entity represents a bug or defect which arrives from external (i.e.\ a customer) or internal sources. It can be mapped to different entities from products down to specific test cases. Trouble reports are handled by implementing a fix in a specific build.
 
 \section{Existing relational implementation}
 The relational database schema in use by CIMS represents the above mentioned entities in a different abstraction. Representation of these entities are described in depth in the sections below. 
 The schema of the relational database in CIMS is presented in figure~\ref{fig:sql}.
-\hiddensubsection{Test suite}
+\hiddensubsection{Job}
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.5]{figure/job.jpg}
 \caption{Diagram of tables related to test suites.}
 \label{fig:job}
 \end{figure}
-The top level entity of a test suite is represented by the job table. A job is used to group related job events and thereby form a test suite. A test suite is run within a build, as seen in figure~\ref{fig:job}, a job belongs to a build via the 'build job mapping' table. 
+A job in the relational implementation does not have a directly corresponding entity in the high level diagram visualised in figure~\ref{fig:er}. The job is a technical entity that groups related test cases and test suites. As seen in figure~\ref{fig:job} a job is represented by the job table which is linked to a build via the build\_job\_mapping table. 
+
 \hiddensubsection{Build}
 \begin{figure}[h!]
 \centering
@@ -32,14 +33,17 @@ The top level entity of a test suite is represented by the job table. A job is u
 \caption{Diagram of tables related to builds.}
 \label{fig:build}
 \end{figure}
-In the relational database, a build is represented by the build table. Each build can posses a number of artifacts and deliverable\_events, as seen in figure~\ref{fig:build}. An artifact can be whatever we want...
-\hiddensubsection{Test case}
+In the relational database, a build is represented by the build table. Each build can posses a number of artifacts and deliverable events, as seen in figure~\ref{fig:build}. An artifact can for instance be the path to an binary that is included in the build. The deliverable\_event table is for defining which deliverables that belongs to the build.
+\hiddensubsection{Job event}
+\label{sec:jobEvent}
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.5]{figure/job_event.jpg}
 \caption{Diagram of tables related to test cases.}
 \label{fig:job_event}
 \end{figure}
+The relational representation of a test case and test suite described in figure~\ref{fig:er} is the job event entity. Each test case and test suite registered in CIMS becomes a job event, the job events that are related forms a hierarchic tree describing the execution of a test. As seen in figure~\ref{fig:job_event} a job event is represented by the job\_event table which is linked to multiple tables containing normalized data about the job event. In figure~\ref{fig:jeTrend} the influx of rows into the job\_event table is visualised. The insertion rate of rows into the tables containing additional information about the job event is equal to the trend in figure~\ref{fig:jeTrend}, but the cardinality can differ. 
+
 
 \hiddensubsection{Deliverable}
 \begin{figure}[h!]
@@ -48,13 +52,8 @@ In the relational database, a build is represented by the build table. Each buil
 \caption{Diagram of tables related to trouble reports.}
 \label{fig:deliverable}
 \end{figure}
+A deliverable in the relational database represents a trouble report described in figure~\ref{fig:er}. As seen in figure~\ref{fig:deliverable} a deliverable is defined by the tables deliverable, deliverable\_event, deliverable\_status and deliverable\_affected\_testcase. These tables contains normalized data about an deliverable. 
 
-
-\section{Use cases}
-\label{sec:usecases}
-The set of queries that the archive should support is presented in the following sections. They are described in domain terms and in terms of the relational implementation of CIMS.
-
-%table~\ref{tab:queries}.
 
 \begin{figure}[h!]
 \centering
@@ -62,6 +61,61 @@ The set of queries that the archive should support is presented in the following
 \caption{Diagram of the relational database in CIMS.}
 \label{fig:sql}
 \end{figure}
+
+\section{Data generation rate}
+In the introduction the accumulated amount of job events where shown in figure~\ref{fig:jeTrend} to illustrate the current data growth trend for one specific product at Ericsson. According to data, two reason for this trend being as it is can be observed. First of all the amount of builds registered every month is increasing, as can be seen in figure~\ref{fig:builds}. Second, the amount of events (which are primarly made up of test cases) for a build is increasing as well, albeit not that aggressively. This ratio is shown in figure~\ref{fig:events_per_build}. As such, every month, the amount of generated events increase, as seen in figure~\ref{fig:events}.
+
+This is what the data reflects, but one can of course ask what the underlying reasons are. 
+%This section further elaborates on the on why there is an increase and what the increase consists pf.
+%
+%The rate of data generation in the Continous Integration CIMS is increasing as shown in figure~\ref{fig:jeTrend}
+%Due to various reasons, such as resource constraints, this trend will eventually start to level out, so far no signs of this has been shown.  
+
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/events.png}
+\caption{Generated events per month. Not accumulated.}
+\label{fig:events}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/builds.png}
+\caption{Generated builds per month. Not accumulated.}
+\label{fig:builds}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/events_per_build.png}
+\caption{Events per build. Not accumulated.}
+\label{fig:events_per_build}
+\end{figure}
+
+%* Skriva lite här om varför det har ökat så mycket. Kanske prata med John.\\ 
+%* Visa resultatet av de mätningar som gjorts om antalet build och job\_events. \\
+%* Med hjälp av de mätningar så kan man skriva lite prognoser om hur mycket data som kommer genereras om 1,2 eller 5 år.
+
+\section{Use cases}
+\label{sec:usecases}
+
+There are a number of use cases for the archive that can provide business value at Ericsson and thereby motivates why saving data in an archive is viable. The two main use cases are the ability of having information about each build, even the builds that were executed years ago and the ability of performing analysis on larger data sets. 
+
+The first use case is an important part in Ericsson's blabla process of correcting bugs that a customer finds in the customer's live environment. Even if Continuous Integration leads to shorter release cycles, the lead time of deploying new software at a customer is still relatively long. It can also be the case that the user don't need or have the resources or demand to update the used software. A customer can use software that was released years ago, when a customer finds a bug or their system crashes, it is crucial to have all information about that particular build that the customer is using in order to quickly correct the flaw. Information such as  Information as if all tests succeeded, if there were any registered trouble reports on that build and so on. This is why we are doing this thesis, to provide business value to Ericsson and not doing any Academical Shiet.
+
+The second use case can give Ericsson further insigt in the quality and trends in their development processes. As stated in the literatur review, you can't managae what you can't measure. For Ericsson to be able to improve in their processes of building and designing software, metadata of the software needs to be analyzed. The data in CIMS needs to be correlated with other sources of information, such as the trouble report system and so on. This use case will provide value to roles such as managers, they can in nearly real time see if the quality of the produced software is declining or increasing and can be more certain that it is not just an temporary event because they will have the ability of doing analysis on years of data. Ordbajs.
+
+
+
+
+* Skriva om mer praktiska use cases och vad de kan ge för positiva effekter. Till exempel kunna kolla upp ett 3 år gammalt bygge när en kunds mjukvara har kraschat och mjukvaran är 3 år gammal. (Även om CI ger många byggen och tätare releaser kan kunden fortfarande sitta på gammal mjukvara, långa ledtider). \\
+* Det blir alltså här som vi motiverar varför datan skall sparas.\\
+* Sedan kunnna skriva några queries som behövs för att kunna uppnå de tidigare nämnda use cases och nämna hur dessa queries ser ut i portalen idag.\\
+* Det är kanske inte use case, men är stor motivation för arkivet är kostnadsbesparing, kunna ha data som inte används så ofta på billigare diskar. \\
+
+
+%table~\ref{tab:queries}.
+
 
 %\begin{table}[h]
 %\begin{tabular}{|l|l|}
@@ -86,7 +140,9 @@ The set of queries that the archive should support is presented in the following
 %\label{tab:queries}
 %\end{table}
 
-\hiddensubsection{Get build}
+\hiddensubsection{Queries}
+In order to manage the use cases mentioned in the section above, the archive needs to support a large set of queries. A selection these queries are presented in the section below. They are described in domain terms and in terms of the relational implementation of CIMS.
+\hiddensubsubsection{Get build}
 \label{q:getbuild}
 Query in CIMS: Get build by id \\
 SQL: {\tt SELECT * FROM cims\_build WHERE id = 'some\_id'} \\
@@ -94,7 +150,7 @@ Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 } \\
 Example output: \\
 This query is simply used to uniquely identify a build.
 
-\hiddensubsection{Get build information}
+\hiddensubsubsection{Get build information}
 \label{q:getbuildinfo}
 Query in CIMS: Get build information by id \\
 SQL: {\tt SELECT product\_name, product\_revision, verdict, start, end FROM cims\_build WHERE id = 'some\_id'} \\
@@ -102,7 +158,7 @@ Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 }  \
 Example output: \\
 Given a unique build id, return the basic information for that build, i.e. product, revision, verdict, start/stop times.
 
-\hiddensubsection{Get build for root test suite}
+\hiddensubsubsection{Get build for root test suite}
 \label{q:getbuildforroot}
 Query in CIMS: Get build by job event simple id \\
 SQL: 
@@ -116,27 +172,27 @@ Example input: {\tt 1234567 }  \\
 Example output: \\
 This query should retrieve the build that a root test suite belongs to.
 
-%\hiddensubsection{Get trouble reports for build}
+%\hiddensubsubsection{Get trouble reports for build}
 %\label{q:getrforbuild}
 %Query in CIMS: Get deliverables for build \\
 %Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 }  \\
 %Example output: \\
 %Given a unique build id, return a list of deliverables valid for that build. In domain terms this means %retrieving all trouble reports that affect the build.
 
-%\hiddensubsection{Get trouble report fixes for build}
+%\hiddensubsubsection{Get trouble report fixes for build}
 %\label{q:getrfixforbuild}
 %Query in CIMS: Get deliverables for build \\
 %Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 }  \\
 %Example output: \\
 %Given a unique build id, retrieve all trouble report fixes that the build delivered.
 
-%\hiddensubsection{Get trouble reports for product and revision}
+%\hiddensubsubsection{Get trouble reports for product and revision}
 %\label{q:gettrforprod}
 %Query in CIMS: Get deliverables for product and revision \\%%Example input: {\tt (Product=ndpgsn\_5\_0\_llvdragon\_mkx\_sprint3,\ Revision=R1A03) }  \\
 %Example output: \\
 %Given a combination of a product name and a revision name, return a list of deliverables that affect that combination. In domain terms this means returning trouble reports that affect the combination.
 
-%\hiddensubsection{Get test suite children}
+%\hiddensubsubsection{Get test suite children}
 %\label{q:gettestsuitechildren}
 %Query in CIMS: Get job event children \\
 %SQL: {\tt SELECT * FROM cims\_job\_event WHERE parent\_jobevent\_id = 'some\_id' }
@@ -144,14 +200,14 @@ This query should retrieve the build that a root test suite belongs to.
 %Example output: \\
 %For implementational reasons, both test cases and test suites are represented as job events in the relational data model of CIMS. As such, a job event id uniquely identifies a specific test case or test suite in a specific build. This query should, given a job event id, return its children. In domain terms this means that for a specific build, return the child nodes of a test suite. These child nodes can be test cases (leaf nodes) or test suites (tree nodes).
 
-%\hiddensubsection{Get test case in build}
+%\hiddensubsubsection{Get test case in build}
 %\label{q:gettcinbuild}
 %Query in CIMS: Get job event by id \\
 %SQL: {\tt SELECT * FROM cims\_job\_event WHERE id = 'some\_id' } \\
 %Example input: {\tt fff70f3a-c69e-44c1-b9f5-7e5ae5a59610 } \\%%Example output: \\
 %This query should retrieve information about a test case in a specific build. In the relational data model of CIMS this can be translated to retrieving a job event by its unique id.
 
-%\hiddensubsection{Get test suite in build}
+%\hiddensubsubsection{Get test suite in build}
 %\label{q:gettcinbuild}
 %Query in CIMS: Get job event by id \\
 %SQL: {\tt SELECT * FROM cims\_job\_event WHERE id = 'some\_id' } \\
@@ -159,7 +215,7 @@ This query should retrieve the build that a root test suite belongs to.
 %Example output: \\
 %This query should retrieve information about a test suite in a specific build. In CIMS, test suites and test cases are both represented by the job event entity and as such the query in CIMS is the same as the previous query.
 
-\hiddensubsection{Get root test suite for test case/test suite}
+\hiddensubsubsection{Get root test suite for test case/test suite}
 \label{q:getrootts}
 Query in CIMS: Get root job event \\
 SQL:
@@ -174,7 +230,7 @@ Example input: {\tt fff70f3a-c69e-44c1-b9f5-7e5ae5a59610 } \\
 Example output: \\
 Given the unique id of a test case or test suite, this query should retrieve the related root test suite.
 
-\hiddensubsection{Get test case by name}
+\hiddensubsubsection{Get test case by name}
 \label{q:gettcbyname}
 Query in CIMS: Get job event by name \\
 SQL: {\tt SELECT * FROM cims\_job\_event WHERE name = 'some\_name' } \\
@@ -182,7 +238,7 @@ Example input: {\tt tc\_48\_027\_handover\_roaming\_restricted } \\
 Example output: \\
 Every test case has a descriptive name. This query should retrieve all test cases with a given name. This means retrieving test cases from different builds, since builds often share the same test suites and test cases.
 
-%\hiddensubsection{Get test suite for test case}
+%\hiddensubsubsection{Get test suite for test case}
 %\label{q:gettsfortc}
 %Query in CIMS: Get parent job event \\
 %SQL:
@@ -195,7 +251,7 @@ Every test case has a descriptive name. This query should retrieve all test case
 %Example output: \\
 %For a test case in a specific build, retrieve the test suite it belongs to in that build.
 
-\hiddensubsection{Get test case history}
+\hiddensubsubsection{Get test case history}
 \label{q:tchistory}
 Query in CIMS: Get event history \\
 SQL: This query cannot be expressed as a single SQL statement and is implemented on the application level in CIMS by performing several SQL queries and building a dictionary with the results. Psuedo code for query:
@@ -220,7 +276,7 @@ Example input: {\tt tc\_48\_027\_handover\_roaming\_restricted } \\
 Example output: \\
 This query should return the history of a test case, identified by its name, filtered optionally by extra parameters. It should group the results by product and for each of these show the builds containing the specific test case and the verdict of the test case in that build.
 
-%\hiddensubsection{Get test tree}
+%\hiddensubsubsection{Get test tree}
 %\label{q:gettesttree}
 %Query in CIMS: Get job tree by id or job name \\
 %SQL: This query cannot be performed with a single SQL statement. The tree structure is built on the application level. Pseudo code:
@@ -233,7 +289,7 @@ This query should return the history of a test case, identified by its name, fil
 %In the relational data model of CIMS, a job represents a root test suite for a specific build. I.e a test suite with no parent. This query should, given a unique id of such a job, return the hierarchical representation of that job.
 
 
-\hiddensubsection{Get all build data}
+\hiddensubsubsection{Get all build data}
 \label{q:getallbuilddata}
 Query in CIMS: na \\
 SQL: This specific query is not expressed as a single SQL statement. Pseudo code:

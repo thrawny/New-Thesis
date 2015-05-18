@@ -50,3 +50,5 @@ We have identified a specific use case for polyglot persistence, namely to manag
 
 \section{Future work}
 There are limitations to our proposed solutions. One technical problem that have not been fully addressed is schema evolution. While a non relational archive would likely eliminate the need of migrate data to new schema versions, querying on data with varying structure is an identified problem in literature. As such, one area for future work is to extend the archive system with support for automatic querying over multiple document versions.
+
+We also believe that we have identified some interesting points for future work when it comes to analysing the continuous integration process using accumulated data. Since adoption of CI at Ericsson, more builds are registered every month (see fig X) and at the same time, builds contain more and more test cases. It would be interesting to see what effects this has on the developed software. Does quality increase? Are more defects detected? 

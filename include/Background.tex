@@ -11,15 +11,22 @@ Write something good here please.
 \section{Related Work}
 
 \subsection{Continuous Integration}
-TODO
+As was stated in the introduction, CI is a software practise where work is integrated frequently, preferable more than once a day \cite{FowlerCI}. A very central concept to CI is the automated build, which should be run in many stages of the development cycle. Duval et al.\ \cite{CIbook} state that the purpose of the build is to "put source code together and verify it is working as a cohesive unit". Builds typically compile code, test, inspect, deploy and so on \cite{CIbook}. CI stresses the need for this process to be automated, no part other than perhaps starting the build should be performed manually. CI also implies use of some version control system (VCS) to integrate work and a CI server that waits for changes in the VCS and automatically runs integration builds when they are detected.
+
+It is useful to make a distinction between private and integration builds. The difference can be illstrutated with an example workflow;
+First, when a developer is done with a task, a private build should be run. Only if it is successful the work should be pushed to the used VCS which will trigger an integration build. While private builds can be seen as trial and error, where they can fail often and be fixed, the goal for the integration build is that it should never fail. If it does, then it becomes a top priority to get it fixed \cite{FowlerCI}.
+
+This kind of workflow is useful to understand and relate to the context at Ericsson and CIMS. While CIMS is not a CI server, it aggregates and presents data from different systems, including the CI server, VCS and code review.
+
 
 \subsection{Big Data}
 %--Stycken i denna subsektion måste refaktoreras.
 Since the internet was invented, big data is considered to be the phenomenon that has received the most attention in the computing industry \cite{bigDataWarehouse}. Today's popularity for big data is mainly derived from the current maturity in technologies combined with the ongoing decline in hardware costs \cite{bigDataWarehouse, bigDatabigAn}. This has led to the development of systems which enable the processing and handling of big data \cite{bigDataWarehouse}.
 
+Big data can be described by three characteristics; volume, velocity and variety. Volume is the quantity of data generated. As an example, Walmart gathers more than 2.5 petabytes of customer transaction data per hour \cite{bigDataMane}. The velocity of data gathering should be nearly real-time, which enables the organization to be more agile. Data gathered can have a variety in structure and a variety in origin, which gives the ability to correlate data from different sources. If any of these three characteristics are so extreme that they can't be processed using traditional technologies, it is considered to be big data \cite{bigDataWarehouse}. The boundary of when data becomes big data is influenced by which sector a system is in use. It is always in movement along with advancements in technology for that sector \cite{bigDatabigAn}. 
+
 When traditional relational databases are used, due to its limitations, analytics can only use relative small data sets to create models. The wanted level of certainty in the models are thereby harder to achieve \cite{bigDatabigAn}. With big data and its technologies, analytics now has the possibility to use far more data when creating predictive models. As described by Minelli et al. in \cite{bigDatabigAn}, big data enables analytics to see the whole iceberg, not just what is visible above the surface. With the capability to gather massive amounts of data, more intelligence can be mined from the data which can, if done right, be translated into business value \cite{bigDataMane}.
 
-Big data can be described by three characteristics; volume, velocity and variety. Volume is the quantity of data generated. As an example, Walmart gathers more than 2.5 petabytes of customer transaction data per hour \cite{bigDataMane}. The velocity of data gathering should be nearly real-time, which enables the organization to be more agile. Data gathered can have a variety in structure and a variety in origin, which gives the ability to correlate data from different sources. If any of these three characteristics are so extreme that they can't be processed using traditional technologies, it is considered to be big data \cite{bigDataWarehouse}. The boundary of when data becomes big data is influenced by which sector a system is in use. It is always in movement along with advancements in technology for that sector \cite{bigDatabigAn}. 
 
 %-------------------------------------------
 \subsection{NoSQL databases}
@@ -38,18 +45,16 @@ Four different categories of NoSQL data stores mentioned in \cite{Catell} and \c
 
 \hiddensubsubsection{Key value stores}
 
-Key value stores uses a key-value index as structure, each value corresponds to a key which is used for lookups and deletes for that value\cite{Catell}. The data model used is a map or dictionary, which is simpler compared to a relational table and gives a faster query speed compared to a relational database \cite{NoSQLSurvey}. 
+Key value stores uses a key-value index as structure, each value corresponds to a key which is used for lookups and deletes for that value\cite{Catell}. The data model used is a map or dictionary, which is simpler compared to a relational table and gives a faster query speed compared to a relational database \cite{NoSQLSurvey}.
 
 \hiddensubsubsection{Document stores}
-
 Compared with the key value store where the key is used for look-ups, a document store uses a query based on the structure of the document combined with certain attributes like a primary key in order to retrieve data. The structure of the documents in a document store does not need to be defined upfront and the structure of the documents does not need to be homogeneous. As such, the document store is said to be schema-less \cite{NoSQLDistilled}. The data structure of a document is a hierarchical tree which can contain lists, nested objects and maps \cite{Catell, NoSQLDistilled}. Due to the freedom in a document's structure and depending on which document store used, there exists different techniques to model relations between objects in a document store. These offer different benefits in terms of performance, size on disk etc. 
 
 \hiddensubsubsection{Graph Databases}
-
-Many NoSQL databases mentioned in \cite{Catell} consists of blobs of data with low coupling. However, in the case graph databases the opposite is true. Graph databases consist of small records with high and complex coupling. A graph is a data structure containing nodes that are connected with arcs\cite{NoSQLDistilled}. This highly interconnected structure gives the ability to query information based on the relations between nodes, for instance "find the parts included in product X that were manufactured by Y and shipped by Z". The relational databases would model these relations with foreign keys, but when querying complex relationships, the joins required becomes heavily performance demanding. The querying and traversal between the relationships becomes efficient and cheap in graph databases compared to the relational databases \cite{NoSQLDistilled}.
+Many NoSQL databases mentioned in \cite{Catell} consists of blobs of data with low coupling. However, in the case of graph databases the opposite is true. Graph databases consist of small records with high and complex coupling. A graph is a data structure containing nodes that are connected with arcs\cite{NoSQLDistilled}. This highly interconnected structure gives the ability to query information based on the relations between nodes, for instance "find the parts included in product X that were manufactured by Y and shipped by Z". The relational databases would model these relations with foreign keys, but when querying complex relationships, the joins required becomes heavily performance demanding. The querying and traversal between the relationships becomes efficient and cheap in graph databases compared to the relational databases \cite{NoSQLDistilled}.
 
 \hiddensubsubsection{Column-Family Stores}
-Categorized as extensible document stores by \cite{Catell}. 
+These databases are categorized as extensible document stores by \cite{Catell}. The data model is similar to relational databases in that data consists of rows and columns \cite{Catell}. However, these systems are designed to be distributed by sharding records either horizontally or vertically across nodes \cite{10rules}. Similar to documents in a document-store, rows in a column-family store need not adhere to a predefined schema and can contain different attributes. 
 
 %---------------------------------------------
 
@@ -61,7 +66,7 @@ The word polyglot means something that is made up of several languages. In the f
 
 %The argument for polyglot persistence is simple; Use the right tool for the right job. This means storing data in the form it naturally exists in its domain. One implication is that a system should potentially be made up of multiple databases, where each database is designed for specific kinds of data and to solve specific problems.
 
-Polyglot persistence is closely related to the rise in popularity of NoSQL databases. These databases should not be considered general purpose \cite{Catell, polyglotms} but should instead be used for solving specific problems involving specific kinds of data. For the purposes of this study, polyglot persistence is an interesting approach that warrants further investigation. Since use cases for live and historical data are different and the fact that the amount of collected historical data will grow forever, we believe that using different kinds databases for live and historical data might be beneficial. 
+Polyglot persistence is closely related to the rise in popularity of NoSQL databases. These databases should not be considered general purpose \cite{Catell, polyglotms} but should instead be used for solving specific problems involving specific kinds of data. For the purposes of this study, polyglot persistence is an interesting approach that warrants further investigation. Since use cases for live and historical data are different and given the fact that the amount of collected historical data will grow forever, we believe that using different kinds databases for live and historical data might be beneficial. 
 
 %A typical use case for NoSQL is storing massive scale and potentially unstructured data. This is an area where relational databases historically have a problem \cite{Catell}.
 
