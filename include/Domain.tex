@@ -101,17 +101,17 @@ This is what the data reflects, but one can of course ask what the underlying re
 
 There are a number of use cases for the archive that can provide business value at Ericsson and thereby motivates why saving data in an archive is viable. The two main use cases are the ability of having information about each build, even the builds that were executed years ago and the ability of performing analysis on larger data sets. 
 
-The first use case is an important part in Ericsson's blabla process of correcting bugs that a customer finds in the customer's live environment. Even if Continuous Integration leads to shorter release cycles, the lead time of deploying new software at a customer is still relatively long. It can also be the case that the user don't need or have the resources or demand to update the used software. A customer can use software that was released years ago, when a customer finds a bug or their system crashes, it is crucial to have all information about that particular build that the customer is using in order to quickly correct the flaw. Information such as  Information as if all tests succeeded, if there were any registered trouble reports on that build and so on. This is why we are doing this thesis, to provide business value to Ericsson and not doing any Academical Shiet.
+The first use case is an important part in Ericsson's blabla process of correcting bugs that a customer finds in the customer's live environment. Even if Continuous Integration leads to shorter release cycles, the lead time of deploying new software at a customer is still relatively long. It can also be the case that the user don't need or have the resources or demand to update the used software. A customer can use software that was released years ago, when a customer finds a bug or their system crashes, it is crucial to have all information about that particular build that the customer is using in order to quickly correct the flaw. Information such as  Information as if all tests succeeded, if there were any registered trouble reports on that build and so on. 
+%This is why we are doing this thesis, to provide business value to Ericsson and not doing any Academical Shiet.
 
-The second use case can give Ericsson further insigt in the quality and trends in their development processes. As stated in the literatur review, you can't managae what you can't measure. For Ericsson to be able to improve in their processes of building and designing software, metadata of the software needs to be analyzed. The data in CIMS needs to be correlated with other sources of information, such as the trouble report system and so on. This use case will provide value to roles such as managers, they can in nearly real time see if the quality of the produced software is declining or increasing and can be more certain that it is not just an temporary event because they will have the ability of doing analysis on years of data. Ordbajs.
+The second use case can give Ericsson further insight in the quality and trends in their development processes. As stated in the review of related work, you can't manage what you can't measure. For Ericsson to be able to improve in their processes of building and designing software, meta data of the software needs to be analyzed. The data in CIMS needs to be correlated with other sources of information, such as the trouble report system and so on. This use case will provide value to roles such as managers, they can in nearly real time see if the quality of the produced software is declining or increasing and can be more certain that it is not just an temporary event because they will have the ability of doing analysis on years of data. 
 
+%Ordbajs.
 
-
-
-* Skriva om mer praktiska use cases och vad de kan ge för positiva effekter. Till exempel kunna kolla upp ett 3 år gammalt bygge när en kunds mjukvara har kraschat och mjukvaran är 3 år gammal. (Även om CI ger många byggen och tätare releaser kan kunden fortfarande sitta på gammal mjukvara, långa ledtider). \\
-* Det blir alltså här som vi motiverar varför datan skall sparas.\\
-* Sedan kunnna skriva några queries som behövs för att kunna uppnå de tidigare nämnda use cases och nämna hur dessa queries ser ut i portalen idag.\\
-* Det är kanske inte use case, men är stor motivation för arkivet är kostnadsbesparing, kunna ha data som inte används så ofta på billigare diskar. \\
+%* Skriva om mer praktiska use cases och vad de kan ge för positiva effekter. Till exempel kunna kolla upp ett 3 år gammalt bygge när en kunds mjukvara har kraschat och mjukvaran är 3 år gammal. (Även om CI ger många byggen och tätare releaser kan kunden fortfarande sitta på gammal mjukvara, långa ledtider). \\
+%* Det blir alltså här som vi motiverar varför datan skall sparas.\\
+%* Sedan kunnna skriva några queries som behövs för att kunna uppnå de tidigare nämnda use cases och nämna hur dessa queries ser ut i portalen idag.\\
+%* Det är kanske inte use case, men är stor motivation för arkivet är kostnadsbesparing, kunna ha data som inte används så ofta på billigare diskar. \\
 
 
 %table~\ref{tab:queries}.
@@ -153,7 +153,11 @@ This query is simply used to uniquely identify a build.
 \hiddensubsubsection{Get build information}
 \label{q:getbuildinfo}
 Query in CIMS: Get build information by id \\
-SQL: {\tt SELECT product\_name, product\_revision, verdict, start, end FROM cims\_build WHERE id = 'some\_id'} \\
+SQL: 
+\begin{verbatim}
+
+\end{verbatim}
+{\tt  \\
 Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 }  \\
 Example output: \\
 Given a unique build id, return the basic information for that build, i.e. product, revision, verdict, start/stop times.
@@ -269,7 +273,8 @@ builds =
     ON cims_build_job_mapping.build_id = cims_build.id
     WHERE cims_build_job_mapping.job_name IN job_names
 
-(Use list of job_events, jobs, root job events and builds to create result dictionary)
+(Use list of job_events, jobs, 
+root job events and builds to create result dictionary)
 
 \end{verbatim}
 Example input: {\tt tc\_48\_027\_handover\_roaming\_restricted } \\

@@ -11,12 +11,12 @@ Write something good here please.
 \section{Related Work}
 
 \subsection{Continuous Integration}
-As was stated in the introduction, CI is a software practise where work is integrated frequently, preferable more than once a day \cite{FowlerCI}. A very central concept to CI is the automated build, which should be run in many stages of the development cycle. Duval et al.\ \cite{CIbook} state that the purpose of the build is to "put source code together and verify it is working as a cohesive unit". Builds typically compile code, test, inspect, deploy and so on \cite{CIbook}. CI stresses the need for this process to be automated, no part other than perhaps starting the build should be performed manually. CI also implies use of some version control system (VCS) to integrate work and a CI server that waits for changes in the VCS and automatically runs integration builds when they are detected.
+As was stated in the introduction, CI is a software practise where work is integrated frequently, preferable more than once a day \cite{FowlerCI}. A very central concept to CI is the automated build, which should be run in many stages of the development cycle. Duval et al.\ \cite{CIbook} state that the purpose of the build is to "put source code together and verify it is working as a cohesive unit". Builds typically compile code, test, inspect, deploy and so on \cite{CIbook}. CI stresses the need for this process to be automated, no part other than perhaps starting the build should be performed manually. CI also implies use of some version control system (VCS) to integrate work and a CI server that waits for changes in the VCS and automatically runs integration builds when they are detected \cite{FowlerCI}.
 
 It is useful to make a distinction between private and integration builds. The difference can be illstrutated with an example workflow;
 First, when a developer is done with a task, a private build should be run. Only if it is successful the work should be pushed to the used VCS which will trigger an integration build. While private builds can be seen as trial and error, where they can fail often and be fixed, the goal for the integration build is that it should never fail. If it does, then it becomes a top priority to get it fixed \cite{FowlerCI}.
 
-This kind of workflow is useful to understand and relate to the context at Ericsson and CIMS. While CIMS is not a CI server, it aggregates and presents data from different systems, including the CI server, VCS and code review.
+This kind of workflow is useful to understand and relate to the context at Ericsson and CIMS. While CIMS is not a CI server, it aggregates and presents data from different systems, including the CI server, VCS and code review system .
 
 
 \subsection{Big Data}
