@@ -1,4 +1,5 @@
 \chapter{Introduction}
+\label{chap:Introduction}
 
 %The outcome of a builds tests and build steps are examples of data that is produced.
 In recent years, software companies have started to generate much more data about their development processes as a result of the wide adoption of continuous integration. Fowler \cite{FowlerCI} defines continuous integration (CI) as a software practise where developers in a team integrate work frequently, typically once a day or more \cite{FowlerCI}. Each integration is then verified by an automated build that runs tests, checks for code standard violations etc.\ \cite{FowlerCI}. According to Duval et.\ al \cite{CIbook}, the proposed benefits of using CI include an increased project visibility where problems like failing builds can be noticed instantly. Therefore, data generated through the use of CI is crucial to the success of the practise, since CI stresses the need for transparency, information sharing and information visualization \cite{FowlerCI, CIbook}. Collecting this data also opens up companies to analyze trends about their development processes in the long term \cite{bigDataMane, CIbook}. However, Schram and Anderson \cite{MySQLToNoSQL} state that having software systems that generate large amounts of data on a daily basis is not without consequence and likely introduces challenges. These include having the appropriate technical infrastructure and software in place to deal with data growth and also supporting different use cases for operating on collected data.  
@@ -33,9 +34,8 @@ Both these problems were addressed using a design research approach. This approa
 \section{Research Purpose}
 The purpose of this study is to identify and evaluate solutions for management of historical data in a continuous integration system. Specifically, to evaluate the suitability of polyglot persistence (see section~\ref{sec:pp}) in that context. Based on the problem description and the research purpose, we ask the following research questions:
 
-RQ1: What are the challenges of monotonic data growth in continuous integration systems? \\
-RQ2: How can historical data in continuous integration systems be managed in the long term? \\
-RQ3: Does the value gained from solving the problem of monotonic growth in continuous integration systems outweigh the identified costs related to implementing a solution for the problem? \\
+RQ1: How can historical data in continuous integration systems be managed in the long term? \\
+RQ2: Does the value gained from solving the problem of monotonic growth in continuous integration systems outweigh the identified costs related to implementing a solution for the problem? \\
 
 \section{Research Method}
 This thesis will be conducted using design research methods based on knowledge from \cite{DS, Peffers, DesignEval}. Design research is performed by building and evaluating artifacts that are designed with the purpose of addressing a specified business need or problem \cite{DS}. 

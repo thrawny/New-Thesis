@@ -1,54 +1,71 @@
 \chapter{Conclusion}
 \label{chap:conclusion}
-This thesis was conducted with the goal to design and develop solutions for dealing with monotonic data growth and management of historical data in a continuous integration system at Ericsson. In order for proposed solutions to be useful there was a need to understand the domain in which they should operate and why the problem had occurred in the first place. This was surveyed in detail before proceeding with design and implementation. 
+This thesis was conducted with two overall goals. First, to design and develop solutions for management of historical data in a continuous integration system at Ericsson. Second, to investigate what value the proper management of historical data can bring to the organization. Using a design research approach, two prototypes were designed and evaluated against a set of predefined solution objectives. 
 
-Three different archive prototypes were constructed to solve the problem.
+%This thesis was conducted with the goal to design and develop solutions for dealing with monotonic data growth and management of historical data in a continuous integration system at Ericsson. To be able to design solutions that provide real utility there was a need to first understand the domain in which they should operate. This helped inform what the function and value of the solution could be.
 
-In the following sections of this chapter we first respond to research questions and then proceed to describe implications for practitioners, academic contributions and ideas for future work.
+
+%Why is an archive solution suitable for an continous integration tool?
+%
+%Why is there a need for in the long term saving data from an continous integration tool?
+%
+%Why will an archive solution provide business value for Ericsson's Continous Integration System?
+
+
+\section{Contributions}
+
+%The focus was to investigate what value historical data in a continuous integration system can bring to an organization. This was done by first proposing practical solutions to manage historical data and secondly investigating how this data should be utilized once it is stored.
+
+Many companies are adopting continuous integration and could face problems similar to the one at Ericsson. For a practitioner the process in which we designed our solution could be used to identify some steps to take toward a solution in the practitioners own context. For example, to create a high level schema that can be used as a basis for transforming existing data models. Or to identify what queries need to be supported for an archive and how well these translate over to the data model of the archive database.
+
+As for academic contributions, this thesis adds to knowledge about software engineering and continuous integration in particular. This was achieved by taking a design research approach to address practical issues of CI in the context of data management. Adopting CI naturally means generating large amounts of data about the development process and as such, one can ask what value can be extracted from this data. In this thesis we have identified some ways this data can be utilized. 
+
+%Two interesting use cases for storing historical data in CI systems have been identified.
+
+%We have exemplified a solution for archiving historical data in a continuous integration system at Ericsson.
+
+%We have identified a specific use case for polyglot persistence, namely to manage historical data in a continuous integration system. The identified use case and evaluation of the polyglot persistence approach using NoSQL is our academic contribution.
 
 %RQ1: What are the challenges of monotonic data growth in continuous integration systems? \\
 %RQ2: How can historical data in continuous integration systems be managed in the long term? \\
 %RQ3: Does the value gained from solving the problem of monotonic growth in continuous integration systems outweigh the identified costs related to implementing a solution for the problem? \\
 
-\section{RQ1 - Challenges of monotonic data growth}
-The first obvious challenge for a company is to recognize that data growth is present for a system and that the success of a particular system is likely to make growth rates increase. Through this study we have seen that it might not be trivial to be aware of the effects of growth until systems start to underperform or break. It would certainly be good if there were ways to plan ahead for the possibility to scale with the amount of data that a system generates. On the other hand, premature optimization is considered to be the root of all evil and agile/lean methods typically recommend dealing with problems at the latest possible moment. In any case, having some kind of plan is not the same as optimizing too early.
+\section{Revisting research questions}
+In this section we relate findings from the results of the design research process and the review of related work to the context at Ericsson and use this knowledge to respond to the research questions.
 
-As soon as a case of monotonic data growth has been identified, many other challenges emerge. At some point someone has to decide whether it is prudent to keep all data that is created or if it provides enough business value to justify it being saved. There are trends from industry and literature that the current way to go is to save this data for a rainy day. This has much to do with the maturity of big data related technology and the ever decreasing price of storage.
+\hiddensubsection{RQ1 - How can historical data be managed}
+At the end of the design research process in this thesis, two different archive prototypes had been implemented, one using a relational database (MySQL/TokuDB) and one using a NoSQL database categorized as a search engine (Elasticsearch). Through the evaluation of these prototypes, we show that they effectively address the solution objectives that were defined in adherence with the design research process. The two solutions are different to each other in many respects as they provide different potential benefits and drawbacks, which we elaborate further below.
 
-If it is the case that all historical data is to be saved then the plan should be to use it such that it brings value back to the company. Then it becomes important to find out how and by who the data is going to be used. In the case of continuous integration systems at Ericsson, we have through this thesis identified different use cases that need to be supported in order to maximize business value. We believe this identification process to be a challenge in its own right.
+Using a relational database as an archive is the simplest solution and would solve many of the data growth problems that motivated the work conducted in this thesis. The main benefits are that developers at Ericsson are already very experienced with the technology and should have few problems implementing a solution. In support of this, findings from our study indicate that existing relational technology can be augmented to scale to well enough for the data growth problem to be solved for a long time. However, some functionality is harder to implement, such as a real time free text search and large scale analytics.
 
-\section{RQ2 - Management of historical data}
-The concept of polyglot persistence and the literature on this subject provided much benefit in terms of addressing the problem at hand. As a solution to this problem, the goal of physically separating the complete data set into two parts, one for live data and one for historical data, was the first step to designing a system that is much more efficient. Achieving this goal enables many things. 
+In contrast, a search engine solution is also a viable option. Technology like Elasticsearch is quite mature and naturally solves scalability since the technology was designed with this in mind. In addition, the possibility for full text search and analytics are greater using a search engine as opposed to a relational database. There are drawbacks. Developers are likely not as experienced with the technology and people who wish to use the search engine must learn new ways to query for data. Introducing a non relational archive also brings a new data model into the code base. This means that that developers need to manage two different data models for the same data. In any case, we believe this is the future in many ways. We also believe organisations should learn to use technologies other than relational databases when the problem and use case calls for them, thereby moving towards polyglot persistence solutions.
 
-- Keeping live data in a relational database is highly beneficial if the size of live data is small. \\
-- Accessing historical data has no effect on performance of the database with the live data. \\
-- Possibility to have different solutions for live and historical data. \\
+\hiddensubsection{RQ2 - Value of a solution}
+Our opinion is certainly that it is valuable to have an archiving solution for historical data in a continuous integration system. Given the maturity of big data technologies, the possibility to store and analyze large data sets is becoming less and less expensive. In the context of software development, this lets the company (Ericsson) learn more about and quantify the efficiency of its development process. Managers is also given the ability to take data-driven decisions with years of data as a basis. As McAfee and Brynjolfsson states in \cite{bigDataMane}, these advantages is of paramount importance in order to be more productive and profitable than competitors.
 
-\section{RQ3 - Value of a solution}
-It can be argued that instead of implementing a solution to the identified problem, historical data should simply be removed on a regular basis. This could be a cheaper option as the costs related to implementing and maintaining a solution might not outweigh its benefits. 
+In addition, having a continuous integration and deployment process in place leads to a higher frequency of builds and releases. However, it does not necessarily follow that the upgrade cycle of customers match with the release cycle of the software development process. As such, different customers potentially use a variety of old and new releases. If problems arise with an older release, it is very important that all data related to this release is stored and can be accessed quickly.
 
-However, we would argue that existing literature on big data and findings from this study do indicate that implementing a solution is not unreasonable for the benefit it provides. In this study, three different archive prototypes were developed, each with different benefits and drawbacks. We would like to present two of these as the likely options moving forward and we argue these two are reasonable to use in production and provide real utility.
+Furthermore, at software companies such as Ericsson, the continuous integration tools in use are often business critical entities. Providing high up time and reliability for these entities should be considered of high importance. By physically separating live and stale data, the live data set which is accessed much more frequently is kept at a constant and manageable size which should greatly increase the performance of applications that access the live data. Also, when live and stale data is separated, the stale data which is accessed much less frequently and by fewer people, can be stored on cheaper machines, thereby reducing overall cost.
 
-\hiddensubsection{Relational archive}
-This is by far the simplest solution and would solve many of the data growth problems that motivated the work conducted in this thesis. The main benefits are that developers at Ericsson are already very experienced with the technology and should have few problems implementing the solution. In support of this, findings from our study indicate that existing relational technology can be augmented to scale to well enough for the data growth problem to be solved for a long time.
-
-However, some functionality is hard to implement using only relational technology, such as a real time free text search and large scale analytics. The question is if the value of this functionality is high enough to justify a more complex solution.
-
-\hiddensubsection{Search engine archive}
-A search engine solution is a viable option. Technology like Elasticsearch is quite mature and naturally solves scalability since the technology was designed with this in mind. In addition, the possibility for full text search and analytics are greater using a search engine as opposed to a relational database.
-
-There are drawbacks. Developers are likely not as experienced with the technology and people who wish to use the search engine must learn new ways to query for data.
-
-We believe this is the future in many ways, and organisations should learn to use technologies other than relational databases when the problem and use case calls for them.
-
-
-\section{Implications for practitioners}
-Many companies are adopting continuous integration and will likely have problems similar to the one at Ericsson. For a practitioner the process in which we designed our solution could be used to identify some steps to take toward a solution in the practitioners own context. For example, to create a high level schema that can be used as a basis for transforming existing data models. Or to identify what queries need to be supported for an archive and how well these translate over to the data model of the archive database.
-
-\section{Academic contributions}
-We have identified a specific use case for polyglot persistence, namely to manage historical data in a continuous integration system. The identified use case and evaluation of the polyglot persistence approach using NoSQL is our academic contribution.
+%Using an archive solution would decrease the amount of data in the live database, thereby providing a solution on the problems mentioned in chapter~\ref{chap:Introduction}.
 
 \section{Future work}
-There are limitations to our proposed solutions. One technical problem that have not been fully addressed is schema evolution. While a non relational archive would likely eliminate the need of migrate data to new schema versions, querying on data with varying structure is an identified problem in literature. As such, one area for future work is to extend the archive system with support for automatic querying over multiple document versions.
+There are limitations to our proposed solutions. One technical problem that have not been fully addressed is schema evolution. While a non relational archive would likely eliminate the need to migrate data to new schema versions, querying on data with varying structure is an identified problem in literature. As such, one area for future work is to extend the archive system with support for automatic querying over multiple documents or schema versions. 
 
-We also believe that we have identified some interesting points for future work when it comes to analysing the continuous integration process using accumulated data. Since adoption of CI at Ericsson, more builds are registered every month (see fig X) and at the same time, builds contain more and more test cases. It would be interesting to see what effects this has on the developed software. Does quality increase? Are more defects detected? 
+We also believe that we have identified some interesting points for future work when it comes to analyzing the continuous integration process using accumulated data. Since adoption of CI at Ericsson, more builds are registered every month (see figure~\ref{fig:builds}) and at the same time, builds contain more and more test cases (see figure~\ref{fig:events_per_build}). It would be interesting to see what effects this has on the developed software. Does quality increase? Are more defects detected? 
+
+%\section{RQ1 - Challenges of monotonic data growth}
+%The first obvious challenge for a company is to recognize that data growth is present for a system and that the success of a particular system is likely to make growth rates increase. Through this study we have seen that it might not be trivial to be aware of the effects of growth until systems start to underperform or break. It would certainly be good if there were ways to plan ahead for the possibility to scale with the amount of data that a system generates. On the other hand, premature optimization is considered to be the root of all evil and agile/lean methods typically recommend dealing with problems at the latest possible moment. In any case, having some kind of plan is not the same as optimizing too early.
+%
+%As soon as a case of monotonic data growth has been identified, many other challenges emerge. At some point someone has to decide whether it is prudent to keep all data that is created or if it provides enough business value to justify it being saved. There are trends from industry and literature that the current way to go is to save this data for a rainy day. This has much to do with the maturity of big data related technology and the ever decreasing price of storage.
+%
+%If it is the case that all historical data is to be saved then the plan should be to use it such that it brings value back to the company. Then it becomes important to find out how and by who the data is going to be used. In the case of continuous integration systems at Ericsson, we have through this thesis identified different use cases that need to be supported in order to maximize business value. We believe this identification process to be a challenge in its own right.
+%
+%\section{RQ2 - Management of historical data}
+%The concept of polyglot persistence and the literature on this subject provided much benefit in terms of addressing the problem at hand. As a solution to this problem, the goal of physically separating the complete data set into two parts, one for live data and one for historical data, was the first step to designing a system that is much more efficient. Achieving this goal enables many things. 
+%
+%- Keeping live data in a relational database is highly beneficial if the size of live data is small. \\
+%- Accessing historical data has no effect on performance of the database with the live data. \\
+%- Possibility to have different solutions for live and historical data. \\
+%
+%\section{RQ3 - Value of a solution}

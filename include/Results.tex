@@ -1,16 +1,13 @@
 \chapter{Results and Discussion}
 \label{chap:results}
 
-In this chapter we present results from the evaluation phase. Given the iterative nature of design research, some adjustments were made between iterations. While we began looking at two different NoSQL databases and one relational database to use for implementing archive prototypes, we ended up moving forward with only Elasticsearch and TokuDB. This was due to an increased knowledge over time about the domain, archive use cases and the technologies themselves. As such, the results included in this section focus on the last iteration of development where all focus was put on Elasticsearch and TokuDB.
+In this chapter we present results from the evaluation phase. Given the iterative nature of design research, some adjustments were made between iterations. While we began looking at two different NoSQL databases and one relational database to use for implementing archive prototypes, we ended up moving forward with only Elasticsearch and TokuDB. This was due to an increased knowledge over time about the domain, archive use cases and the technologies themselves. Following the initial iterations, we came to the conclusion that Elasticsearch was the more interesting of the two NoSQL alternatives to pursue further and that doing so would yield more interesting results. Still, to have something to relate it the descision was made to do also perform most of evaluation points for TokuDB as well.
+As such, the results included in this section focus on the last iteration of development where all focus was put on Elasticsearch and TokuDB. 
 
 \section{Testing environment}
-Access was given to a dedicated server in order achieve more control of the environment so as to get more dependable measurements. However, it should emphasized that the the purpose of doing the measurements was not to perform an experiment and we do not claim to have done so. Instead, the goal was to assess initial feasibility of the solutions and see if they would perform in an adequate manner. More specifically, we ask if the measurements of disk usage, memory utilization, insertion time, query response time etc.\ are good enough to warrant going forward beyond prototype construction.
+Access was given to a dedicated server\footnotemark\ in order to achieve more control of the environment so as to get more dependable measurements. However, it should emphasized that the the purpose of doing the measurements was not to perform an experiment and we do not claim to have done so. Instead, the goal was to assess initial feasibility of the solutions and see if they would perform in an adequate manner. More specifically, we ask if the measurements of disk usage, memory utilization, insertion time, query response time etc.\ are good enough to warrant going forward beyond prototype construction.
 
-Some notable specs on the dedicated server; \\
-Operating system: Redhat Linux 6.6 \\
-Processor: Intel Xeon 48 cores \\
-RAM: 256 GB \\
-Storage: 2TB
+\footnotetext{Specs: Redhat Linux 6.6, 256GB RAM, 2TB storage}
 
 
 \section{Data separation}
@@ -20,11 +17,11 @@ For evaluation and testing purposes, access was given to a CIMS instance with a 
 
 \section{Query support}
 
-The set of important queries defined in section~\ref{sec:usecases} has been implemented for the archive prototypes using mongodb and elasticsearch. This section describes the outcome of this implementation along with reasoning about the complexity of the queries.  
+The set of important queries defined in section~\ref{sec:usecases} has been implemented for the archive prototype using Elasticsearch. This section describes the outcome of this implementation along with reasoning about the complexity of the queries.  
 
-The set of important queries translated based on the non-relational schema (section~\ref{nosqlmodel}) was defined previously in section~\ref{sec:archiveapi}. These queries were implemented as part of an API component than can be used to for testing purposes and by other systems. Implementation of all queries was successful. How the queries for the archive is written and the effectiveness of the queries is highly dependent on the design of the non relational schema. Several differences in query properties of the archive prototypes compared to the CIMS database has been noted. Due to the denormalization of data, fewer joins are required for the non-relational databases and the joins that are performed are done on the application level. Joins on this level leads to more round trips to the database, but lightens the computational resources used by the database.
+The set of important queries translated based on the non-relational schema (section~\ref{nosqlmodel}) was defined previously in section~\ref{sec:archiveapi}. These queries were implemented as part of an API component than can be used to for testing purposes and by other systems. Implementation of all queries was successful in the sense that the queries can certainly be expressed using the query language of ES, if application side joins are allowed. However, how the effectiveness of the queries is highly dependent on the design of the non relational schema. Several differences in query properties of the archive prototype compared to the CIMS database has been noted, as is to be expected. Due to the denormalization of data, fewer joins are required for the non-relational databases and the joins that are performed are done on the application level. Joins on this level leads to more round trips to the database, but lightens the computational resources used by the database. As long as application side joins are simple in nature, i.e.\ fetch one record, get its id and fetch related records, we believe using application side joins are acceptable. For anything else, data should be denormalized so that joins are not needed. It should also be noted that Elasticsearch provides native joins through a parent/child API. We did however not have time to explore this functionality but instead decided to use application side joins.
 
-\hiddensubsection{Elasticsearch}
+%\hiddensubsection{Elasticsearch}
 
 
 %\hiddensubsection{MongoDB}
@@ -84,7 +81,7 @@ The first migration performed was that of the previously mentioned CIMS instance
 \addplot coordinates {(480,180)};
 \addplot coordinates {(480,259)};
 \addplot coordinates {(480,550)};
-\addplot coordinates {(480,135)};
+\addplot coordinates {(480,108)};
 \legend{MongoDB,ElasticSearch,InnoDB, TokuDB}
 \end{axis}
 \end{tikzpicture}
@@ -119,7 +116,7 @@ The first migration performed was that of the previously mentioned CIMS instance
 \subsection{Memory utilization}
 
 \hiddensubsubsection{Elasticsearch}
-In Elasticsearch some configuration related to memory usage is needed to achieve stable performance. It is recommended to set the JVM heap size that ES uses to no more than half of total RAM available but never no more than 32GB \cite{ESmemory}. Elasticsearch will typically use more memory than just the heap size, but this usage will be delegated to the operating system. Tests were done with 8GB, 16GB and 32GB heap size for both querying and insertion. Insertion using an 8GB heap would make Elasticsearch crash since garbage collection could not keep up. But 16 and 32GB gave stable insertion performance. However, there was no observable difference in insertion rates between 16 and 32GB heap sizes. When doing mass insertion Elasticsearch would quickly reserve half of available system memory. So insertion rates certainly seem to scale with available RAM.
+In Elasticsearch some configuration related to memory usage is needed to achieve stable performance. It is recommended to set the JVM heap size that ES uses to no more than half of total RAM available but never no more than 32GB \cite{ESmemory}. Elasticsearch will typically use more memory than just the heap size, but this usage will be delegated to the operating system. Tests were done with 8GB, 16GB and 32GB heap size for both querying and insertion. Insertion using an 8GB heap would make Elasticsearch crash since garbage collection could not keep up. But 16 and 32GB gave stable insertion performance. However, there was no observable difference in insertion rates between 16 and 32GB heap sizes. Notably, when doing bulk insertion Elasticsearch would quickly reserve half of available system memory but no more (according to the default configuration). So insertion rates seem to scale with available RAM.
 
 On the other hand querying was different. Performing many subsequent queries would not pool RAM like insertion did. Also no positive effect on response time could be observed by increasing the heap size. Elasticsearch was stable with 8, 16 and 32 heap sizes and response times were the same. 
 
@@ -155,9 +152,13 @@ On the other hand querying was different. Performing many subsequent queries wou
 \subsection{Insertion time}
 
 \hiddensubsubsection{Elasticsearch}
-Elasticsearch was configured to use a 1 node setup. The CIMS instance was then migrated. With this configuration the process took 21 hours. This figure is not very reliable since it is also dependent on the database server of the CIMS instance. To get more dependable results we measured insertion rates for dummy data up to a total of 3.3 billion documents. The generation of data was performed locally. During the insertion of dummy data we could achieve a mean insertion rate of 32 million documents per hour. What is very notable here is that even using a 1 node setup we observed no performance degradation for insert rates when the total data set grew. So when going from 0 documents to 3.3 billion the insert rate was as far as we could observe constant.
-
-In figure x, we present a graph of insertion rates in relation to data set size.
+Elasticsearch was configured to use a 1 node setup. The CIMS instance with 480 million job events was then migrated. With this configuration the process took 21 hours. This figure is not very reliable since it is also dependent on the database server of the CIMS instance. To get more dependable results we measured insertion rates for dummy data up to a total of 3.3 billion documents. The generation of data was performed locally. During the insertion of dummy data we could achieve a mean insertion rate of about 33 million documents per hour. What is very notable here is that even using a 1 node setup we observed little to no performance degradation for insert rates when the total data set grew. So when going from 0 documents to 3.3 billion the insert rate was as far as we could observe constant. In figure~\ref{fig:insert_rate}, we present a graph of insertion rates in relation to data set size.
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/insert_rate.png}
+\caption{Insertion rate of dummy job event data into Elasticsearch.}
+\label{fig:insert_rate}
+\end{figure}
 
 When switching to a cluster with 4 nodes (4 ES instances running on the same machine), much greater insert rates could be achieved and we observed over 60 million per hour in this case.
 
@@ -174,51 +175,81 @@ Measurements were made in regards to query response time with the large data set
 
 For the latter, the result set size will likely grow much more slowly. It is not dependent on the overall data set size but instead depends on if the size of test suites grow. This is in the hands of the developers who construct the test suites. In comparison to looking up a test case by name, looking up test suite children is not random across the entire data set. This because test cases from the same build and test suite are inserted together. As such, querying for test suite children should be faster than querying by test case name. But the response time is also highly dependant on the size of the result set.
 
-These two queries should be adequate to gain enough information but how effective Elasticsearch is when querying on large data sets.
+These two queries should be gain some indication to the effectiveness of Elasticsearch is when querying on large data sets. In figure~\ref{fig:query_by_name} the response times when querying by name is shown. The figure has 500 data points in total, where for each points a name is selected randomly from a list of all names of test cases from one CIMS instance. There are about 16000 unique names in total. The outliers in the figure are due to that a name was selected more than once and results where cached for the second the time query was executed with the same name. Notably, the response time is long for this query because of the large result sets. If the whole result set is not needed but say, only the first few hundred hits, which is a more realistic scenario in every day usage, the response time would be just a few seconds.
 
-Get job event ny name \\
-asddfgsdf, 90 seconds, 60k events \\
-alsjkd, 90 seconds, 60k events \\
-askdlj, 90 seconds, 60k events \\
-aslkdjasd, 90 seconds, 60k events \\
-oipioipi, 90 seconds, 60k events \\
-iyuiytyuie, 90 seconds, 60k events \\
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/query_by_name.png}
+\caption{Query response time in Elasticsearch when looking up job events by name.}
+\label{fig:query_by_name}
+\end{figure}
 
-Get job event children \\
-2394234-290384, 5 seconds, 1k events \\
-2394234-290384, 5 seconds, 1k events \\
-2394234-290384, 5 seconds, 1k events \\
-2394234-290384, 5 seconds, 1k events \\
-2394234-290384, 5 seconds, 1k events \\
-2394234-290384, 5 seconds, 1k events \\
+
+%Get job event ny name \\
+%asddfgsdf, 90 seconds, 60k events \\
+%alsjkd, 90 seconds, 60k events \\
+%askdlj, 90 seconds, 60k events \\
+%aslkdjasd, 90 seconds, 60k events \\
+%oipioipi, 90 seconds, 60k events \\
+%iyuiytyuie, 90 seconds, 60k events \\
+%
+%Get job event children \\
+%2394234-290384, 5 seconds, 1k events \\
+%2394234-290384, 5 seconds, 1k events \\
+%2394234-290384, 5 seconds, 1k events \\
+%2394234-290384, 5 seconds, 1k events \\
+%2394234-290384, 5 seconds, 1k events \\
+%2394234-290384, 5 seconds, 1k events \\
 
 \subsection{Horizontal Scalability}
-Not yet addressed
-Här borde vi kunna skriva tekniska saker, men från de tekniska saker dra slutsater i Discussion som svarar på om dessa tekniker ger något business value?
-%\hiddensubsubsection{MongoDB}
-\hiddensubsubsection{Elasticsearch}
-"Lessons learned while scaling with Elasticsearch, future work can be to test with more nodes".\\
-Compared to MongoDB, horizontal scaling with Elasticsearch demands more configuration upfront in order to get a suitable cluster.
-In MongoDB, an arbitrary number of nodes can be added to the cluster. The maximum number of nodes in an Elasticsearch cluster can never be higher then the total amount of shards, which must be defined when an index (collection of documents) is created.
+While Elasticsearch performed well in our tests using a single node setup with large data sets, having the possibility to go smoothly from single node to cluster is important to consider. Before adding more nodes to an Elasticsearch cluster, the amount of shards per index must be defined as it sets the upper bound for the total amount possible nodes in the cluster.
 
-%This restriction depends on how Elasticsearch is scaling in an horizontal manner. The partitioning of data when adding new nodes to a cluster is dependent on how many shards the initial node holds, as an new node is added to the cluster it overtakes shards from the already existing nodes.
+In ES, all data in an index is split up into shards. These shards can themselves not be split and as such, one shard is always stored in its entirety on a single node. However, nodes can store multiple shards from the same index, as is the case in the single node setup that was tested on. In this setup, four total shards were predefined per index. For production, the total number of shards is typically set to a much higher amount. 
 
-\hiddensubsubsection{TokuDB}
+Given the setup that was predefined, the maximum number of deployable nodes was four. The single node setup was then converted to a four node cluster where all nodes resided on the testing machine. Doing the conversion was as trivial as starting a new ES process configured with the same cluster name an already running ES process. The cluster then automatically handles shard allocation to available nodes.
+
+
+%Not yet addressed
+%Här borde vi kunna skriva tekniska saker, men från de tekniska saker dra slutsater i Discussion som svarar på om dessa tekniker ger något business value?
+%%\hiddensubsubsection{MongoDB}
+%\hiddensubsubsection{Elasticsearch}
+%"Lessons learned while scaling with Elasticsearch, future work can be to test with more nodes".\\
+%Compared to MongoDB, horizontal scaling with Elasticsearch demands more configuration upfront in order to get a suitable cluster.
+%In MongoDB, an arbitrary number of nodes can be added to the cluster. The maximum number of nodes in an Elasticsearch cluster can never be higher then the total amount of shards, which must be defined when an index (collection of documents) is created.
+%
+%%This restriction depends on how Elasticsearch is scaling in an horizontal manner. The partitioning of data when adding new nodes to a cluster is dependent on how many shards the initial node holds, as an new node is added to the cluster it overtakes shards from the already existing nodes.
+%
+%\hiddensubsubsection{TokuDB}
 
 \section{Integration with CIMS}
-Some proof of concept functionality was request by stakeholders at Ericsson to demonstrate the possibility of integrating the archive with CIMS and the suitability of polyglot persistence. As mentioned previously, the viewing of builds was selected as a suitable piece of functionality to evolve to use the archive. Elasticsearch was the archive prototype that was chosen to use for this implementation. It was possible with reasonable effort to implement a new build viewer in CIMS that used the archive API to present build data. However, the view was somewhat simplified given time constraints and because of the way CIMS is designed, where it is not always pain free to change the underlying data source for web page components. We do maintain that this it is possible to do if the system is redesigned somewhat to reduce coupling between data models and views.
+Proof of concept functionality was requested by stakeholders at Ericsson to demonstrate the possibility of integrating the archive with CIMS and the suitability of polyglot persistence. As mentioned previously, the viewing of builds was selected as a suitable piece of functionality to evolve to use the archive. It was possible with reasonable effort to implement a new build viewer in CIMS that used the archive API to present build data. However, the view was somewhat simplified given time constraints and because of the way CIMS is designed, where it is not always pain free to change the underlying data source for web page components. We do maintain that this it is possible to do if the system is redesigned somewhat to reduce coupling between models and views.
 
-To demonstrate the new archive build viewer we used the following somewhat contrived use case as a basis; Initially the archive contains no data. A user views the list of all builds and finds a build that has a reference build. The user then goes on to delete the reference build. Before the build is deleted from the relational database it is first migrated to the archive. Then when requesting to view the reference build, the archive will be used to present it instead of the relational database. On this new build page it can be noted that it is the archive that is used as the underlying data source and the page also contains links to view the raw build and test data in Elasticsearch.
+To demonstrate the new archive build viewer we used the following somewhat contrived use case as a basis; \\
+- Initially the archive is empty \\
+- User views list of all builds. \\
+- User identifies build that has a reference build. \\
+- User deletes the reference build.  \\
+- System moves build to archive before it is deleted.  \\
+- User requests to view reference build. \\
+- System presents data about reference build using the archive API. \\
+
+%Initially the archive contains no data. A user views the list of all builds and finds a build that has a reference build. The user then goes on to delete the reference build. Before the build is deleted from the relational database it is first migrated to the archive. Then when requesting to view the reference build, the archive will be used to present it instead of the relational database. On this new build page it can be noted that it is the archive that is used as the underlying data source and the page also contains links to view the raw build and test data in Elasticsearch.
 
 This use case is mostly used for demonstration purposes and we believe a more realistic way of moving data from the live database to the archive would be to use scheduled jobs that do this on for example a weekly basis.
 
 \section{Organizational suitability}
-This section describes the organizational suitability of the different artifacts.
-%\hiddensubsection{MongoDB}
-\hiddensubsection{Elasticsearch}
-There are a few reasons as to why we believe using ES would work well for the organization. First of all, CIMS already employs a number of different data stores other than MySQL. In some sense it is already a polyglot persistence solution as it makes use of Redis, Sphinx and RabbitMQ. So when developing CIMS it is required to be familiar multiple databases and their respective ways of representing data. Going from this situation to also using Elasticsearch should not be considered very problematic.
+This section describes the organizational suitability of two archive prototypes.
 
-Through discussions with the CIMS development team this opinion is somewhat cemented as they are very open to discussing and trying out new technologies and have been doing so before this thesis was conducted.
+%\hiddensubsection{MongoDB}
+
+\hiddensubsection{Elasticsearch}
+There are a few reasons as to why we believe using ES would work well for the organization. First of all, CIMS already employs a number of different data stores other than MySQL. In some sense it is already a polyglot persistence solution as it makes use of Redis, Sphinx and RabbitMQ. So when developing CIMS it is required to be familiar multiple databases and their respective ways of representing data. Going from this situation to also using Elasticsearch should not be considered very problematic. Through discussions with the CIMS development team this opinion is somewhat cemented as they are very open to discussing and trying out new technologies and have been doing so before this thesis was conducted. 
+
+In an article by Stonebraker and Catell \cite{10rules}, several rules are given to aid the selection of what they classify as simple operation data stores, namely databases that scale horizontally and avoid complex operations like cross node joins. One notable rule is to consider out-of-the-box behaviour of a candidate database. The better this behaviour is the less of a pain it will be to initially configure the candidate database. We, the authors of this thesis, do not make any claim to be database experts but our experience of Elasticsearch and its out-of-the-box behaviour is certainly positive in many respects. The amount of configuration to get stable performance was minimal. As mentioned earlier, the only variable we had to consider in order to get stable performance was the JVM heap size. On top of this, it was easy to go from a single node setup to a cluster. 
+
+However, while the initial configuration was pain free, there are many things to consider when it comes to schema and query design in Elasticsearch. For example, it is important to know upfront what kinds of queries that the field of a document or the document as a whole should support. Notably, if a field requires to be queried on by an exact value comparison, this must be configured upfront (typically by declaring the field as 'not analyzed'). As such, most of the time spent on Elasticsearch was not done configuring the database but rather optimizing schemas and exploring the rich query possibilities.
+
+Overall, we think Elasticsearch is a interesting candidate to consider moving forward and see no real problems as to why it would not be possible to use, taking the organizational context into consideration.
 
 \hiddensubsection{TokuDB}
 Since TokuDB is a storage engine for MySQL, for this solution the live database and the archive would be identical for everything but the storage engine. As such, this solution has very little friction to use as everyone working with CIMS is already very knowledgeable about relational databases and MySQL in particular. The solution is simple and would solve many of identified problems related to monotonic data growth. Through the other points of evaluation for TokuDB we have shown that using TokuDB as a storage engine it is very possible to scale to billions of rows on a single machine when it comes to both insertion rate and query performance.
