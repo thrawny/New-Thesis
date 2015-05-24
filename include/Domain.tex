@@ -33,7 +33,7 @@ A job in the relational implementation does not have a directly corresponding en
 \caption{Diagram of tables related to builds.}
 \label{fig:build}
 \end{figure}
-In the relational database, a build is represented by the build table. Each build can posses a number of artifacts and deliverable events, as seen in figure~\ref{fig:build}. An artifact can for instance be the path to an binary that is included in the build. The deliverable\_event table is for defining which deliverables that belongs to the build.
+In the relational database, a build is represented by the build table. Each build can posses a number of artifacts and deliverable events, as seen in figure~\ref{fig:build}. An artifact can for instance be the path to a binary file that is included in the build. The deliverable\_event table is for defining which deliverables (i.e.\ trouble reports) belongs to the build.
 \hiddensubsection{Job event}
 \label{sec:jobEvent}
 \begin{figure}[h!]
@@ -42,7 +42,7 @@ In the relational database, a build is represented by the build table. Each buil
 \caption{Diagram of tables related to test cases.}
 \label{fig:job_event}
 \end{figure}
-The relational representation of a test case and test suite described in figure~\ref{fig:er} is the job event entity. Each test case and test suite registered in CIMS becomes a job event, the job events that are related forms a hierarchic tree describing the execution of a test. As seen in figure~\ref{fig:job_event} a job event is represented by the job\_event table which is linked to multiple tables containing normalized data about the job event. In figure~\ref{fig:jeTrend} the influx of rows into the job\_event table is visualised. The insertion rate of rows into the tables containing additional information about the job event is equal to the trend in figure~\ref{fig:jeTrend}, but the cardinality can differ. 
+The relational representation of a test case and test suite described in figure~\ref{fig:er} is the job event entity. Each test case and test suite registered in CIMS becomes a job event and the job events that are related forms a tree structure describing the execution of a test suite. As seen in figure~\ref{fig:job_event} a job event is represented by the job\_event table which is linked to multiple tables containing normalized data about the job event.
 
 
 \hiddensubsection{Deliverable}
@@ -62,46 +62,12 @@ A deliverable in the relational database represents a trouble report described i
 \label{fig:sql}
 \end{figure}
 
-\section{Data generation rate}
-In the introduction the accumulated amount of job events where shown in figure~\ref{fig:jeTrend} to illustrate the current data growth trend for one specific product at Ericsson. According to data, two reason for this trend being as it is can be observed. First of all the amount of builds registered every month is increasing, as can be seen in figure~\ref{fig:builds}. Second, the amount of events (which are primarly made up of test cases) for a build is increasing as well, albeit not that aggressively. This ratio is shown in figure~\ref{fig:events_per_build}. As such, every month, the amount of generated events increase, as seen in figure~\ref{fig:events}.
-
-This is what the data reflects, but one can of course ask what the underlying reasons are. 
-%This section further elaborates on the on why there is an increase and what the increase consists pf.
-%
-%The rate of data generation in the Continous Integration CIMS is increasing as shown in figure~\ref{fig:jeTrend}
-%Due to various reasons, such as resource constraints, this trend will eventually start to level out, so far no signs of this has been shown.  
-
-\begin{figure}[h!]
-\centering
-\includegraphics[]{figure/events.png}
-\caption{Generated events per month. Not accumulated.}
-\label{fig:events}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[]{figure/builds.png}
-\caption{Generated builds per month. Not accumulated.}
-\label{fig:builds}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[]{figure/events_per_build.png}
-\caption{Events per build. Not accumulated.}
-\label{fig:events_per_build}
-\end{figure}
-
-%* Skriva lite här om varför det har ökat så mycket. Kanske prata med John.\\ 
-%* Visa resultatet av de mätningar som gjorts om antalet build och job\_events. \\
-%* Med hjälp av de mätningar så kan man skriva lite prognoser om hur mycket data som kommer genereras om 1,2 eller 5 år.
 
 \section{Use cases}
 \label{sec:usecases}
+A number of use cases have been identified for the archive that can provide business value to Ericsson and thereby motivates why saving data in an archive is viable. These include the ability to have information about each build, even builds that were executed years ago and the ability to perform analysis on larger data sets. 
 
-There are a number of use cases for the archive that can provide business value at Ericsson and thereby motivates why saving data in an archive is viable. The two main use cases are the ability of having information about each build, even the builds that were executed years ago and the ability of performing analysis on larger data sets. 
-
-The first use case is an important part in Ericsson's process of managing bugs that is found by the customer running live versions of a software. Even if Continuous Integration leads to shorter release cycles, the lead time of deploying new software at a customer is still relatively long. It can also be the case that the customer don't have the need or resources to upgrade to a newer software version. This leads to that customers can use software that was released years ago. When a customer finds a bug or their system crashes, in order to quickly fix that bug, it is crucial to have all information about that particular build in use by the customer. Information such as the outcome of all tests performed, warnings in the build procedure are examples of such necessary information. 
+The first use case is an important part in Ericsson's process of managing bugs that is found by the customer running live versions of a software. Even if CI leads to shorter release cycles, the lead time of deploying new software at a customer is still relatively long. It can also be the case that the customer don't have the need or resources to upgrade to a newer software version. This leads to that customers can use software that was released years ago. When a customer finds a bug or their system crashes, in order to quickly fix that bug, it is crucial to have all information about that particular build in use by the customer. Information such as the outcome of all tests performed, warnings in the build procedure are examples of such necessary information. 
 
 The second use case can give Ericsson further insight in the quality and trends in their development processes. As stated in the review of related work, you can't manage what you can't measure. For Ericsson to be able to improve in their processes of building and designing software, meta data of the software needs to be analyzed. The data in CIMS needs to be correlated with other sources of information, such as the trouble report system. This use case will provide value to roles such as managers, they can in nearly real time see if the quality of the produced software is declining or increasing compared to earlier measurements and can be more certain that it is not just an temporary event because they will have the ability of doing analysis on years of data. 
 
@@ -173,7 +139,7 @@ root job events and builds to create result dictionary)
 \end{verbatim}
 Example input: {\tt tc\_48\_027\_handover\_roaming\_restricted } \\
 Example output: \\
-This query should return the history of a test case, identified by its name, filtered optionally by extra parameters. It should group the results by product and for each of these show the builds containing the specific test case and the verdict of the test case in that build. The full set of queries can is included in appendix X.
+This query should return the history of a test case, identified by its name, filtered optionally by extra parameters. It should group the results by product and for each of these show the builds containing the specific test case and the verdict of the test case in that build. The full set of queries can is included in appendix~\ref{appendix1}.
 
 %\hiddensubsubsection{Get test tree}
 %\label{q:gettesttree}
@@ -216,3 +182,39 @@ This query should return the history of a test case, identified by its name, fil
 %Presentation of data is done in real time via a web application. In order to support this, CIMS employs a number technologies in support of the main relational database, effectively forming a polyglot persistence solution. This includes a search engine (Sphinx) for aggregation of test cases, and a key value store (Redis) for caching.
 %
 %An external REST API is exposed to gather data for other purposes than real time visualization.
+
+\section{Data generation rate}
+We end this chapter by presenting the current data generation rates for builds and events (i.e.\ test cases and trouble reports). This is useful so as to put the growth trends in a context. One part in designing a solution is to be aware of these trends. In the introduction the accumulated amount of job events where shown in figure~\ref{fig:jeTrend}. The figure was chosen to illustrate the overall current data growth trend for one specific product at Ericsson. The cause for this trend is twofold. First of all the amount of builds registered every month is increasing, as can be seen in figure~\ref{fig:builds}. Second, the amount of events (which are primarily made up of test cases) for a build is increasing as well, albeit not that aggressively. This ratio is shown in figure~\ref{fig:events_per_build}. As such, every month, the amount of generated events increase, as seen in figure~\ref{fig:events}.
+
+While the purpose of this study is not investigate why more builds are registered and why builds increase in size, as already stated we believe these figures are important to put the problem in a context. They clearly show the current situation and in part motivate why this has become a problem at Ericsson as of late.
+
+%This is what the data reflects, but one can of course ask what the underlying reasons are. 
+%This section further elaborates on the on why there is an increase and what the increase consists pf.
+%
+%The rate of data generation in the Continous Integration CIMS is increasing as shown in figure~\ref{fig:jeTrend}
+%Due to various reasons, such as resource constraints, this trend will eventually start to level out, so far no signs of this has been shown.  
+
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/events.png}
+\caption{Generated events per month. Not accumulated.}
+\label{fig:events}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/builds.png}
+\caption{Generated builds per month. Not accumulated.}
+\label{fig:builds}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[]{figure/events_per_build.png}
+\caption{Events per build. Not accumulated.}
+\label{fig:events_per_build}
+\end{figure}
+
+%* Skriva lite här om varför det har ökat så mycket. Kanske prata med John.\\ 
+%* Visa resultatet av de mätningar som gjorts om antalet build och job\_events. \\
+%* Med hjälp av de mätningar så kan man skriva lite prognoser om hur mycket data som kommer genereras om 1,2 eller 5 år.

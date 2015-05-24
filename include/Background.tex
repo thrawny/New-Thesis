@@ -3,22 +3,20 @@
 %In this chapter the background and motivation for the study is introduced. This is followed by a section describing related work.
 
 %The work conducted in this thesis draws on knowledge from several fields of research. 
-\
 %In contrast, the fields of Big Data, NoSQL, and polyglot persistence are newer. Knowledge from these fields are used to address the problem, define its solution and to assess feasibility. 
-In this chapter, information relevant to the research fields of this thesis is presented. The thesis includes four ares; Continous Integration, Big Data, NoSQL, and Polyglot Persistence.
+In this chapter, a review of related work is presented. First, the context for the identified research problem is covered, namely that of software development using continuous integration. This context is connected to the field of big data which in broad terms is about management of large quantities of data. Finally, sections about NoSQL and polyglot persistence are more technical in nature and knowledge from these fields are used to aid the design process of the archive prototypes.
 
-\section{Related Work}
+%\section{Related Work}
 
-\subsection{Continuous Integration}
+\section{Continuous Integration}
 As was stated in the introduction, CI is a software practise where work is integrated frequently, preferable more than once a day \cite{FowlerCI}. A very central concept to CI is the automated build, which should be run in many stages of the development cycle. Duval et al.\ \cite{CIbook} state that the purpose of the build is to "put source code together and verify it is working as a cohesive unit". Builds typically compile code, test, inspect, deploy and so on \cite{CIbook}. CI stresses the need for this process to be automated, no part other than perhaps starting the build should be performed manually. CI also implies use of some version control system (VCS) to integrate work and a CI server that waits for changes in the VCS and automatically runs integration builds when they are detected \cite{FowlerCI}.
 
 It is useful to make a distinction between private and integration builds. The difference can be illstrutated with an example workflow;
 First, when a developer is done with a task, a private build should be run. Only if it is successful the work should be pushed to the used VCS which will trigger an integration build. While private builds can be seen as trial and error, where they can fail often and be fixed, the goal for the integration build is that it should never fail. If it does, then it becomes a top priority to get it fixed \cite{FowlerCI}.
 
-This kind of workflow is useful to understand and relate to the context at Ericsson and CIMS. While CIMS is not a CI server, it aggregates and presents data from different systems, including the CI server, VCS and code review system .
+This kind of workflow is useful to understand and relate to the context at Ericsson and CIMS. However, CIMS is not a CI server. Instead it aggregates, stores and presents data from different systems, including the CI server, VCS and code review systems.
 
-
-\subsection{Big Data}
+\section{Big Data}
 %--Stycken i denna subsektion måste refaktoreras.
 Since the internet was invented, big data is considered to be the phenomenon that has received the most attention in the computing industry \cite{bigDataWarehouse}. Today's popularity for big data is mainly derived from the current maturity in technologies combined with the ongoing decline in hardware costs \cite{bigDataWarehouse, bigDatabigAn}. This has led to the development of systems which enable the processing and handling of big data \cite{bigDataWarehouse}.
 
@@ -26,10 +24,8 @@ Big data can be described by three characteristics; volume, velocity and variety
 
 When traditional relational databases are used, due to its limitations, analytics can only use relative small data sets to create models. The wanted level of certainty in the models are thereby harder to achieve \cite{bigDatabigAn}. With big data and its technologies, analytics now has the possibility to use far more data when creating predictive models. As described by Minelli et al. in \cite{bigDatabigAn}, big data enables analytics to see the whole iceberg, not just what is visible above the surface. With the capability to gather massive amounts of data, more intelligence can be mined from the data which can, if done right, be translated into business value \cite{bigDataMane}.
 
-
-
 %-------------------------------------------
-\subsection{NoSQL databases}
+\section{NoSQL databases}
 Catell \cite{Catell} provides an overview of the current dialogue in the database world, primarily regarding big data trends and how to address the problem of scalability depending on technology and applications. The paper focuses on four different categories of databases; key value stores, document stores, extensible document stores and relational databases. Out of these, the first three fall under the category of NoSQL databases. Differences with traditional SQL databases typically boils down to trade-offs made about consistency in favour of scalability and flexible schemas. 
 
 NoSQL databases have been designed primarily to meet modern demands on online applications that need to handle a large amount of concurrent users and store large amounts of possibly unstructured data \cite{Catell}.
@@ -58,7 +54,7 @@ These databases are categorized as extensible document stores by \cite{Catell}. 
 
 %---------------------------------------------
 
-\subsection{Polyglot persistence}
+\section{Polyglot persistence}
 \label{sec:pp}
 There is a consensus in contemporary database literature that relational databases are not going to go away anytime soon \cite{Catell, NoSQLDistilled, NoSQLSurvey}. They are, however, no longer the one and only option for every problem. Instead, a contemporary viewpoint is that no data model can and should have the purpose of describing all kinds of domains \cite{NoSQLDistilled, NoSQLSurvey}. In practise this means that trying to model all data to fit into one kind of database, relational or otherwise, is not a prudent task. This problem is known in literature as impedance mismatch \cite{ORM}. Many strategies \cite{ORM} exist for overcoming it where a more recent one is the concept of polyglot persistence \cite{NoSQLDistilled}. 
 

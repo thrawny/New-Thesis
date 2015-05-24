@@ -3,7 +3,7 @@
 \chapter{Appendix 1}
 \label{appendix1}
 \section{Queries}
-\hiddensubsection{Relational queries}'
+\hiddensubsection{Relational queries}
 \label{relationalqueries}
 \hiddensubsubsection{Get build}
 \label{q:getbuild}
@@ -142,7 +142,7 @@ POST http://localhost:18843/build/_search
 
 
 \hiddensubsubsection{Get build information}
-\label{q:getbuildEs}
+\label{q:getbuildInfoEs}
 Query for Elasticsearch:
 \begin{verbatim}
 POST http://localhost:18843/build/_search
@@ -180,7 +180,7 @@ POST http://localhost:18843/job/_search
     "fields" :  ["build_job_mapping_build_id"]
 }
 \end{verbatim}
-The result from this query is, which is an build id is then used as parameter to the "Get build information" query described in \ref{q:getbuildinfoEs}. 
+The result from this query is, which is an build id is then used as parameter to the "Get build information" query described in \ref{q:getbuildinfo}. 
 
 
 %Query for MongoDB:
