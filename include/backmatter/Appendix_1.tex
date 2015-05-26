@@ -2,42 +2,29 @@
 \appendix
 \chapter{Appendix 1}
 \label{appendix1}
-\section{Queries}
-\hiddensubsection{Relational queries}
+\section*{Relational queries}
 \label{relationalqueries}
-\hiddensubsubsection{Get build}
+\subsubsection*{Get build}
 \label{q:getbuild}
-Query in CIMS: Get build by id \\
-SQL: {\tt SELECT * FROM cims\_build WHERE id = 'some\_id'} \\
-Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 } \\
-Example output: \\
-This query is simply used to uniquely identify a build.
+{\tt SELECT * FROM cims\_build WHERE id = 'some\_id'}
 
-\hiddensubsubsection{Get build information}
+\subsubsection*{Get build information}
 \label{q:getbuildinfo}
-Query in CIMS: Get build information by id \\
-SQL: 
 \begin{verbatim}
+
 SELECT product_name, revision_name, verdict, start, stop
 FROM cims_build WHERE id = 'some_id'
 \end{verbatim}
-Example input: {\tt CXS101289\_LLVDRAGON\_MKX\_SPRINT3\_R1A03\_140605084139 }  \\
-Example output: \\
-Given a unique build id, return the basic information for that build, i.e. product, revision, verdict, start/stop times.
 
-\hiddensubsubsection{Get build for root test suite}
+\subsubsection*{Get build for root test suite}
 \label{q:getbuildforroot}
-Query in CIMS: Get build by job event simple id \\
-SQL: 
 \begin{verbatim}
+
 SELECT cims_build.* FROM cims_build
 INNER JOIN cims_build_job_mapping
 ON cims_build_job_mapping.build_id = cims_build.id   
 WHERE cims_build_job_mapping.job_id = 'some_simple_id'
 \end{verbatim} 
-Example input: {\tt 1234567 }  \\
-Example output: \\
-This query should retrieve the build that a root test suite belongs to.
 
 %\hiddensubsubsection{Get trouble reports for build}
 %\label{q:getrforbuild}
@@ -82,11 +69,10 @@ This query should retrieve the build that a root test suite belongs to.
 %Example output: \\
 %This query should retrieve information about a test suite in a specific build. In CIMS, test suites and test cases are both represented by the job event entity and as such the query in CIMS is the same as the previous query.
 
-\hiddensubsubsection{Get root test suite for test case/test suite}
+\subsubsection*{Get root test suite for test case/test suite}
 \label{q:getrootts}
-Query in CIMS: Get root job event \\
-SQL:
 \begin{verbatim}
+
 SELECT cims_job_event.* FROM cims_job
 INNER JOIN cims_job_event 
 ON cims_job_event.id = cims_job.root_jobevent_id
@@ -94,35 +80,13 @@ WHERE cims_job.job_name =
 (SELECT job_name FROM cims_job_event WHERE id = 'some_id')
 
 \end{verbatim}
-Example input: {\tt fff70f3a-c69e-44c1-b9f5-7e5ae5a59610 } \\
-Example output: \\
-Given the unique id of a test case or test suite, this query should retrieve the related root test suite.
 
-\hiddensubsubsection{Get test case by name}
+\subsubsection*{Get test case by name}
 \label{q:gettcbyname}
-Query in CIMS: Get job event by name \\
-SQL: {\tt SELECT * FROM cims\_job\_event WHERE name = 'some\_name' } \\
-Example input: {\tt tc\_48\_027\_handover\_roaming\_restricted } \\
-Example output: \\
-Every test case has a descriptive name. This query should retrieve all test cases with a given name. This means retrieving test cases from different builds, since builds often share the same test suites and test cases.
-
-%\hiddensubsubsection{Get test suite for test case}
-%\label{q:gettsfortc}
-%Query in CIMS: Get parent job event \\
-%SQL:
-%\begin{verbatim}
-%SELECT * FROM cims_job_event
-%WHERE cims_job_event.id =
-%(SELECT parent_jobevent_id FROM cims_job_event WHERE id = 'some_id')
-%\end{verbatim}
-%Example input: {\tt fff70f3a-c69e-44c1-b9f5-7e5ae5a59610 } \\
-%Example output: \\
-%For a test case in a specific build, retrieve the test suite it belongs to in that build.
-
-\hiddensubsection{Elasticsearch queries}
-\hiddensubsubsection{Get build}
+{\tt SELECT * FROM cims\_job\_event WHERE name = 'some\_name' }
+\subsection*{Elasticsearch queries}
+\subsubsection*{Get build}
 \label{q:getbuildEs}
-Query for Elasticsearch: \\
 \begin{verbatim}
 POST http://localhost:18843/build/_search
 { 
@@ -134,16 +98,9 @@ POST http://localhost:18843/build/_search
 }
 \end{verbatim}
 
-%Query for MongoDB:
-%\begin{verbatim}
-%db.build.findOne( { "_id": "some_id" } )
-%\end{verbatim}
-%This query is simply used to uniquely identify a build.
 
-
-\hiddensubsubsection{Get build information}
+\subsubsection*{Get build information}
 \label{q:getbuildInfoEs}
-Query for Elasticsearch:
 \begin{verbatim}
 POST http://localhost:18843/build/_search
 { 
@@ -157,18 +114,7 @@ POST http://localhost:18843/build/_search
 }
 \end{verbatim}
 
-%Query for MongoDB:
-%\begin{verbatim}
-%db.build.findOne( 
-%    { "_id": "some_id" }, 
-%    { "product_name": 1, "product_revision": 1, 
-%      "verdict": 1, "start": 1, "end": 1 } 
-%)
-%\end{verbatim}
-
-\hiddensubsubsection{Get build for root test suite}
-Query for Elasticsearch:\\
-This query requires two round trips to Elasticsearch, first to get the id of the job's build, latter to get nformation about that build.\\
+\subsubsection*{Get build for root test suite}
 \begin{verbatim}
 POST http://localhost:18843/job/_search
 { 
@@ -180,22 +126,9 @@ POST http://localhost:18843/job/_search
     "fields" :  ["build_job_mapping_build_id"]
 }
 \end{verbatim}
-The result from this query is, which is an build id is then used as parameter to the "Get build information" query described in \ref{q:getbuildinfo}. 
 
-
-%Query for MongoDB:
-%\begin{verbatim}
-%build_id = db.job.findOne( 
-%    { "job_name": "some_name" }, 
-%    { "build_job_mapping_build_id": 1 } 
-%)
-%db.build.findOne( { "_id": build_id } )
-%\end{verbatim}
-
-\hiddensubsubsection{Get root test suite for test case/test suite}
+\subsubsection*{Get root test suite for test case/test suite}
 \label{q:getroottsEs}
-Query for Elasticsearch:\\
-This query requires two round trips to Elasticsearch, first to get the job event's job name, this name is then used o retrieve information about that job.
 \begin{verbatim}
 POST http://localhost:18843/job_event/_search
 { 
@@ -217,17 +150,7 @@ POST http://localhost:18843/job/_search
 }
 \end{verbatim}
 
-%Query for MongoDB:
-%\begin{verbatim}
-%job_name = db.job_event.findOne( 
-%    { "_id": "some_id" }, 
-%    { "job_name": 1 } 
-%)
-%db.job.findOne( { "_id": job_name } )
-%\end{verbatim}
-
-\hiddensubsubsection{Get test case by name}
-Query for Elasticsearch:
+\subsubsection*{Get test case by name}
 \label{q:gettcbynameEs}
 \begin{verbatim}
 POST http://localhost:18843/job_event/_search
@@ -243,8 +166,3 @@ POST http://localhost:18843/job_event/_search
     }
 }
 \end{verbatim}
-
-%Query for MongoDB:
-%\begin{verbatim}
-%db.job_event.find( { "name": "some_name" } )
-%\end{verbatim}

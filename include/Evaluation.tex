@@ -5,14 +5,14 @@ In this chapter the different evaluation criteria of the artifact are described 
 
 \section{Data separation}
 How well the separation of data works is evaluated qualitatively by reasoning about the general process of migrating data from the live database in CIMS to the database of the archive. This process is dependent on the effectiveness of the software components that are constructed to support the database of the archive.
-A crucial part of this process is the transformation and denormalization of relational data. This transformation is the foundation for how queries can be written against the archive. Depending on how the data is modeled in the archive, operations on that data will have different complexites. The process of separation is also dependent on how the archive database is configured and how suitable it is for the task. 
-
-The basis for the evaluation is to migrate data sets of different sizes, using data from an existing instance of CIMS. This data will be extended with generated dummy data in order to get a data set that is closer in size to what an archive would be after being put into production given the current data growth trends. When migration is complete, it is possible to proceed with evaluation points that require data to be present in the archive.  
+A crucial part of this process is the transformation and denormalization of relational data. The process of separation is also dependent on how the archive database is configured and how suitable it is for the task. 
 
 \section{Query support}
-The utility of the archive is dependant on what queries it supports and how complex these queries are. As a basis for evaluation, the set of important queries defined previously in section~\ref{sec:usecases} is used. Evaluation is done by comparing this set to the set of queries implemented in the archive prototypes which are previously described in section~\ref{sec:archiveapi}. Comparison is made on the difference in the queries complexity. 
+The utility of the archive is dependent on what queries it supports and how these perform at scale. As a basis for evaluation, the set of important queries defined previously in section~\ref{sec:usecases} is used. Evaluation is done by comparing this set to the set of queries implemented in the archive prototypes which are previously described in section~\ref{sec:archiveapi}.
 
-%\section{Schema evolution}
+%Comparison is made on the difference in the queries complexity. 
+
+%This transformation is the foundation for how queries can be written against the archive. Depending on how the data is modeled in the archive, operations on that data will have different complexites.%\section{Schema evolution}
 %The ability of the archive to handle schema evolution is evaluated by introducing realistic schema variation on incoming data to the archive. These changes are defined in collaboration with the CIMS development team and should capture the planned evolution of the database schema in CIMS.
 %
 %This evaluation is qualitative and is based on the "Adaptability of data structures" metric defined in \cite{isoInternalMetric}.
@@ -22,13 +22,14 @@ The following points in this section focus on the ability of an archive prototyp
 %This evaluation will be done both quantitatively and qualitatively. The quantitative evaluation is done by measuring the size of the data in the archive after a migration. This value will then be compared to how much space this data took in the live database. Qualitatively, each data store's underlying ability to scale will be evaluated in means of which hardware and configuration is needed with a given total data size. Specifically, how much RAM is needed for specific data set sizes.
 
 \subsection{Disk usage}
-For the archive to scale, disk usage used must be manageable, even with billions of documents in the archive. The metric used is derived from 'Memory utilization' defined in \cite{isoInternalMetric}, memory is in this case the disk space used by the database of the archive. In order to see the archives ability for long term scalability compared to the live database, measurements is done on both migrated data in the archive and the equivalent data in the live database.               
+For the archive to scale, disk usage used must be manageable, even with billions of documents in the archive. The metric used is derived from 'Memory utilization' defined in \cite{isoInternalMetric}, memory is in this case the disk space used by the database of the archive. In order to see the archives ability for long term scalability compared to the live database, measurements is done on both migrated data in the archive and the equivalent data in a CIMS instance.
 
 \subsection{Memory utilization}
 The used metric originates from the internal metric defined as 'Maximum memory utilization' in ISO/IEC standard TR 9126-2 \cite{isoExternalMetric}. Measurement is made by using the archive to perform tasks like insertion and querying and estimating the amount of memory that is needed to perform the task adequately. 
 
 \subsection{Insertion time}
-For the archive to be viable to use in practice, insertion of new documents into the archive must be efficient. Even with large number of documents already in the archive, the insertions must be made in adequate time. Measurements is be done on insertions of data originated from the live database, the metric will be applied on artifacts containing data sets of various sizes.
+For the archive to be viable to use in practice, insertion of new documents into the archive must be efficient. Even with a large number of documents already in the archive, the insertions must be made in adequate time, which in this case means faster insertions than the data generation rate for a CIMS instance. Currently, the CIMS instance for the largest product being developed produces about 2 million job events per day, and as already stated the trend is increasing (see figure~\ref{fig:events}.
+Measurements are done on insertions of data originated from the live database and generated dummy data similar in size and structure to real data.
 
 \subsection{Horizontal scalability}
 The ability of the archive to scale horizontally is evaluated by qualitatively investigating each constructed prototypes' capability to do so. In this case, capability is defined as the database's characteristics in the following areas: the amount of upfront configuration needed to start a cluster and the amount of configuration needed to add new nodes to a running cluster.
@@ -36,7 +37,7 @@ The ability of the archive to scale horizontally is evaluated by qualitatively i
 \section{Integration with CIMS}
 In order to evaluate the suitability of the polyglot persistence approach, some new functionality that leverage the archive database will be built into CIMS. More specifically, we have chosen to implement the viewing of builds. This new functionality should work as follows; \\
 - User tries requests the web page for a specific build. \\
-- System checks to see if the build and its related data exists in the live relational database. \\
+- System checks to see if the build and its related data exist in the live relational database. \\
 - If a build is found in the live database then it is presented to the user at it normally would. \\
 - If a build is not found then the system checks if the build exists in the archive database. \\
 - If a build is found in the archive database then it is presented using the archive API. \\
