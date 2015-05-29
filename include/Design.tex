@@ -7,7 +7,7 @@ This chapter describes the design of the artifacts that are to be implemented in
 
 Through the review of related work, it has been established that non-relational databases might be appropriate as a part of a solution to the identified problem of this thesis. However, it has also been suggested \cite{NoSQLSurvey} that the introduction of non-relational storage should not replace current relational databases, but should instead work as a complement to them. We argue that a polyglot persistence solution is a natural approach to the identified problem. Implementing such a solution would then address objective 1, namely to physically separate live from stale data. Before implementation, a decision has to be made on what types of databases should be used as the underlying storage for the archive. If the only objective was data separation then the simplest choice would be to completely duplicate system data in its current form to a similar database. However, this does not take into account other objectives and would likely not solve the underlying problem. 
 
-When selecting what databases to use we need address the issue of long running schema migrations. One way this could be addressed is by using a database with a flexible schema, capable of handling heterogeneous data. Said database should also have query capabilities that allow us to effectively address objective 2; the retainment of important queries.
+When selecting what databases to use we need to address the issue of long running schema migrations. One way this could be addressed is by using a database with a flexible schema, capable of handling heterogeneous data. Said database should also have query capabilities that allow us to effectively address objective 2; the retainment of important queries.
 
 In order for the archive system to scale naturally with the current level of data growth (objective 3), it is prudent to select a database with horizontal scaling. In addition to this, it would be highly beneficial with more efficient data compression than what is currently in use by the relational database of CIMS.
 
@@ -50,7 +50,7 @@ To demonstrate the capability of the archive to respond to queries, an API shoul
 
 For Elasticsearch and most NoSQL databases, operations on data can be made via a HTTP REST API, where operations are defined by JSON objects.
 
-The set of important queries defined in section~\ref{sec:usecases} can be translated as follows for the different archive databases. For brevity we only show an example of looking up a test case history. The rest of the translated queries are included in appendix~\ref{appendix1}.
+The set of important queries defined in section~\ref{sec:usecases} can be translated as follows for the different archive databases. For brevity we only show an example of looking up a test case history, seen in figure~\ref{code:tc_history_es}. The rest of the translated queries are included in appendix A.
 
 %\hiddensubsubsection{Get build}
 %\label{q:getbuildEs}
@@ -196,8 +196,8 @@ The set of important queries defined in section~\ref{sec:usecases} can be transl
 
 %\hiddensubsubsection{Get test suite for test case}
 
-\hiddensubsubsection{Get test case history}
-Query for Elasticsearch:
+\begin{figure}
+\begin{mdframed}
 \begin{verbatim}
 job_events = POST http://localhost:18843/job_event/_search
 {
@@ -242,10 +242,13 @@ http://localhost:18843/build/_search
         }
     }
 }
-
-(Use list of builds, jobs and job events to build result dictionairy)
+(Use list of builds, jobs and job events 
+ to build result dictionary)
 \end{verbatim}
-
+\end{mdframed}
+\caption{Implementation of the test case history query using Elasticsearch.}
+\label{code:tc_history_es}
+\end{figure}
  
 %Query for MongoDB:
 %\begin{verbatim}

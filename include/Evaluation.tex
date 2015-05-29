@@ -31,16 +31,24 @@ The used metric originates from the internal metric defined as 'Maximum memory u
 For the archive to be viable to use in practice, insertion of new documents into the archive must be efficient. Even with a large number of documents already in the archive, the insertions must be made in adequate time, which in this case means faster insertions than the data generation rate for a CIMS instance. Currently, the CIMS instance for the largest product being developed produces about 2 million job events per day, and as already stated the trend is increasing (see figure~\ref{fig:events}.
 Measurements are done on insertions of data originated from the live database and generated dummy data similar in size and structure to real data.
 
+\subsection{Query response time}
+To assess how performance of a prototype scales with the size of the data set, query response times will be measured on some important queries that an archive should support.
+
+\subsection{Schema changes}
+Since one of the archive prototypes (TokuDB) uses a relational database, its database schema must match the schema of the CIMS instance that feeds the archive with data. Therefore whenever the schema is changed in the CIMS instance, the schema in the archive must be changed as well. To see how performant this operation is on a large data set, schema changes will be performed on the archive prototype and the time of the operation will be measured. This evaluation point does not apply to Elasticsearch, since it is essentially schema-less.
+
 \subsection{Horizontal scalability}
 The ability of the archive to scale horizontally is evaluated by qualitatively investigating each constructed prototypes' capability to do so. In this case, capability is defined as the database's characteristics in the following areas: the amount of upfront configuration needed to start a cluster and the amount of configuration needed to add new nodes to a running cluster.
 
 \section{Integration with CIMS}
-In order to evaluate the suitability of the polyglot persistence approach, some new functionality that leverage the archive database will be built into CIMS. More specifically, we have chosen to implement the viewing of builds. This new functionality should work as follows; \\
-- User tries requests the web page for a specific build. \\
-- System checks to see if the build and its related data exist in the live relational database. \\
-- If a build is found in the live database then it is presented to the user at it normally would. \\
-- If a build is not found then the system checks if the build exists in the archive database. \\
-- If a build is found in the archive database then it is presented using the archive API. \\
+In order to evaluate the suitability of the polyglot persistence approach, some new functionality that leverage the archive database will be built into CIMS. More specifically, we have chosen to implement the viewing of builds. This new functionality should work as follows;
+\begin{itemize}
+\item User tries requests the web page for a specific build.
+\item System checks to see if the build and its related data exist in the live relational database.
+\item If a build is found in the live database then it is presented to the user at it normally would.
+\item If a build is not found then the system checks if the build exists in the archive database. 
+\item If a build is found in the archive database then it is presented using the archive API. 
+\end{itemize}
 
 \section{Organizational suitability}
 The final point of evaluation is to assess how suitable a solution is from an organizational perspective. There are multiple factors to consider when evaluating the archives' suitability in the organization. For example; who the target users of the archive are, willingness to learn and adopt new technology, willingness to make use of archived data, increased maintenance effort and system complexity and so on. These points will be discussed with relevant people in the organization and will also be extended by observations made throughout the course of the study.
