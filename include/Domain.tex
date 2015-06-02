@@ -10,26 +10,26 @@ This chapter begins with a high level description of the domain. This is followe
 \end{figure}
 
 \section{High level schema}
-For the feasibility of this study, the domain of CIMS has been narrowed to some key entities, which are the following; products, revisions, builds, test suites, test cases and trouble reports. Excluding trouble reports, these entities form a hierarchical structure as seen in figure~\ref{fig:er}. Products are at the top of this hierarchy. They represent the different software systems that are being developed at Ericsson. Products are developed iteratively, where a released iteration is called a revision. At the revision level, developers makes changes to source code, configuration, tests etc.\ which are then checked into a revision control system and subsequently built and tested. This is referred to in domain terms as a build. Each build runs a number of test suites, which in turn consist of a number of test cases.
+For the feasibility of this study, the domain of CIMS has been narrowed to some key entities, which are the following; products, revisions, builds, test suites, test cases and trouble reports. Excluding trouble reports, these entities form a hierarchical structure as seen in figure~\ref{fig:er}. Products are at the top of this hierarchy. They represent the different software systems that are being developed at Ericsson. Products are developed iteratively, where a released iteration is called a revision. At the revision level, developers make changes to source code, configuration, tests etc.\ which are then checked into a revision control system and subsequently built and tested. This is referred to in domain terms as a build. Each build runs a number of test suites, which in turn consist of a number of test cases.
 
 As has been noted, a trouble report sits outside of the hierarchy. This entity represents a bug or defect which arrives from external (i.e.\ a customer) or internal sources. It can be mapped to different entities from products down to specific test cases. Trouble reports are handled by implementing a fix in a specific build.
 
 \section{Existing relational implementation}
-The relational database schema in use by CIMS represents the above mentioned entities in a different abstraction. Representation of these entities is described in depth in the sections below. 
+The relational database schema in use by CIMS represents the above mentioned entities in a different abstraction. Representation of these entities is described in depth in this section. 
 The schema of the relational database in CIMS is presented in figure~\ref{fig:sql}.
-
-\hiddensubsection{Job}
-A job in the relational implementation does not have a directly corresponding entity in the high level diagram visualized in figure~\ref{fig:er}. The job is a technical entity that groups related test cases and test suites. As seen in figure~\ref{fig:job} a job is represented by the job table which is linked to a build via the build\_job\_mapping table. 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.5]{figure/job.jpg}
-\caption{Diagram of tables related to jobs.}
-\label{fig:job}
+\includegraphics[scale=0.5, angle=90]{figure/sql.png}
+\caption{Diagram of the relational database in CIMS.}
+\label{fig:sql}
 \end{figure}
+\clearpage
+
+
 
 \hiddensubsection{Build}
-In the relational database, a build is represented by the build table. Each build can possess a number of artifacts and deliverable events, as seen in figure~\ref{fig:build}. An artifact can for instance be the path to a binary file that is included in the build. The deliverable\_event table is for defining which deliverables (i.e.\ trouble reports) that belongs to the build.
+In the relational database, a build is represented by the build table. Each build can possess a number of artifacts and deliverable events, as seen in figure~\ref{fig:build}. An artifact can for instance be the path to a binary file that is included in the build. A build also contains attributes about which product and revision it belongs to. The deliverable\_event table is for defining which deliverables (i.e.\ trouble reports) that belong to the build.
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=0.5]{figure/build.jpg}
@@ -57,14 +57,19 @@ The relational representation of a test case and test suite described in figure~
 \end{figure}
 
 
+\hiddensubsection{Job}
+A job in the relational implementation does not have a directly corresponding entity in the high level diagram visualized in figure~\ref{fig:er}. The job is a technical entity that groups related test cases and test suites. As seen in figure~\ref{fig:job} a job is represented by the job table which is linked to a build via the build\_job\_mapping table. 
 
-
-
-
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{figure/job.jpg}
+\caption{Diagram of tables related to jobs.}
+\label{fig:job}
+\end{figure}
 
 \section{Use cases}
 \label{sec:usecases}
-A number of use cases have been identified for the archive that can provide business value to Ericsson and thereby motivates why saving data in an archive is viable. These include the ability to have information about each build, even builds that were executed years ago and the ability to perform analysis on larger data sets. 
+Several use cases have been identified for the archive that can provide business value to Ericsson and thereby motivates why saving data in an archive is viable. These include the ability to have information about each build, even builds that were executed years ago and the ability to perform analysis on larger data sets. 
 
 The first use case is an important part in Ericsson's process of managing bugs that is found by the customer running live versions of a product. Even if CI leads to shorter release cycles, the lead time of deploying new software at a customer is still relatively long. It can also be the case that the customer doesn't have the need or resources to upgrade to a newer software version. This leads to that customers can use software that was released years ago. When a customer finds a bug or their system crashes, in order to quickly fix that bug, it is crucial to have all information about that particular build in use by the customer. Information such as the outcome of all tests performed, warnings in the build procedure are examples of such necessary information. 
 
@@ -113,9 +118,9 @@ root job events and builds to create result dictionary)
 
 \section{Data generation rate}
 \label{datagenrate}
-We end this chapter by presenting the current data generation rates for builds and events (i.e.\ test cases and trouble reports). This is useful so as to put the growth trends in a context. One part in designing a solution is to be aware of these trends. In the introduction the accumulated amount of job events where shown in figure~\ref{fig:jeTrend}. The figure was chosen to illustrate the overall current data growth trend for one specific product at Ericsson. The cause for this trend is twofold. First of all the amount of builds registered every month is increasing, as can be seen in figure~\ref{fig:builds}. Second, the amount of events (which are primarily made up of job events) for a build is increasing as well, albeit not that aggressively. This ratio is shown in figure~\ref{fig:events_per_build}. As such, every month, the amount of generated events increases, as seen in figure~\ref{fig:events}.
+We end this chapter by presenting the current data generation rates for builds and events (i.e.\ test cases and trouble reports). This is useful so as to put the growth trends in a context. One part in designing a solution is to be aware of these trends. In the introduction the accumulated number of job events where shown in figure~\ref{fig:jeTrend}. The figure was chosen to illustrate the overall current data growth trend for one specific product at Ericsson. The cause for this trend is twofold. First the number of builds registered is increasing, as can be seen in figure~\ref{fig:builds}. Second, the number of events (which are primarily made up of job events) for a build is increasing as well, albeit not that aggressively. This ratio is shown in figure~\ref{fig:events_per_build}. As such, every month, the number of generated events increases, as seen in figure~\ref{fig:events}.
 
-While the purpose of this study is not investigate why more builds are registered and why builds increase in size, as already stated we believe these figures are important to put the problem in a context. They clearly show the current situation and in part motivate why this has become a problem at Ericsson as of late.
+While the purpose of this study is not investigate why more builds are registered and why builds increase in size, as already stated we believe these figures are important to put the problem in a context. They clearly show the current situation and in part motivate why this has recently become a problem at Ericsson.
 
 %This is what the data reflects, but one can of course ask what the underlying reasons are. 
 %This section further elaborates on the on why there is an increase and what the increase consists pf.
@@ -148,12 +153,6 @@ While the purpose of this study is not investigate why more builds are registere
 %* Visa resultatet av de mätningar som gjorts om antalet build och job\_events. \\
 %* Med hjälp av de mätningar så kan man skriva lite prognoser om hur mycket data som kommer genereras om 1,2 eller 5 år.
 
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=0.5, angle=90]{figure/sql.png}
-\caption{Diagram of the relational database in CIMS.}
-\label{fig:sql}
-\end{figure}
 
 %\hiddensubsubsection{Get test tree}
 %\label{q:gettesttree}

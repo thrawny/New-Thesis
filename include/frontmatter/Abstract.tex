@@ -8,7 +8,17 @@ Chalmers University of Technology\\
 
 \thispagestyle{plain}			% Supress header 
 \section*{Abstract}
-This master's thesis reports on the design and evaluation of two different prototypes for management of historical data in a continuous integration system at Ericsson. Continuous integration is an agile software practice where code is checked in frequently and subsequently built and tested automatically. Due the increasing maturity of this practice at Ericsson, the frequency of these builds is increasing and as such much more data about the development process is generated. The constructed prototypes where designed specifically to address problems related to scalability and performance of the current continuous integration systems in use at the company. Evaluation shows that the prototypes solves scalability problems and increases performance of current systems by separating live from stale data. The value of the prototypes is further motivated by investigating how historical data in a continuous integration system can be utilized for the benefit of the company.
+Continuous integration is an agile software practice where code is checked in frequently and subsequently built and tested automatically. Due to the maturity of this practice at the company Ericsson, the frequency of these automated builds is increasing at the company and as such, much more data about the development process is generated. However, the software systems that gather and present this data was not designed to scale with the current data growth. This has led to several problems surrounding the continuous integration process and the evolution of the software systems that support this process.
+
+This master's thesis reports on the design and evaluation of two different prototypes for management of historical data in continuous integration systems. One of these prototypes uses a NoSQL database for storing historical data and one uses a relational database. The constructed prototypes where designed specifically to address problems related to scalability and performance of the current continuous integration systems in use at Ericsson. Evaluation shows that the prototypes solve scalability problems and increase performance of current systems by separating live and historical data. The value of the prototypes is further motivated by investigating how historical data in a continuous integration system can be utilized for the benefit of the company that has this data.
+
+
+
+%To solve this problem, a distinction between live and stale data is made. Live data concerns currently running builds, and is subject to frequent updates. Stale data concerns finished builds and is never updated. Over time, the stale data set grows mo
+
+%This thesis was conducted as a response to these problems. Using a design research approach, two different prototypes were designed with the purpose to store historical data in a continuous integration system.
+
+%As a response to the problem, a master's thesis was proposed by Ericsson.
 % KEYWORDS (MAXIMUM 10 WORDS)
 \vfill
 Keywords: data management, continuous integration, relational databases, nosql, polyglot persistence, big data

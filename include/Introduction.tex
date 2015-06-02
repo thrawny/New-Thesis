@@ -2,7 +2,7 @@
 \label{chap:Introduction}
 
 %The outcome of a builds tests and build steps are examples of data that is produced.
-In recent years, software companies have started to generate much more data about their development processes as a result of the wide adoption of continuous integration. Fowler \cite{FowlerCI} defines continuous integration (CI) as a software practice where developers in a team integrate work frequently, typically once a day or more \cite{FowlerCI}. Each integration is then verified by an automated build that runs tests, checks for code standard violations etc.\ \cite{FowlerCI}. According to Duval et.\ al \cite{CIbook}, the proposed benefits of using CI include an increased project visibility where problems like failing builds can be noticed instantly. Therefore, data generated through the use of CI is crucial to the success of the practice, since CI stresses the need for transparency, information sharing and information visualization \cite{FowlerCI, CIbook}. Collecting this data also opens up companies to analyze trends about their development processes in the long term \cite{bigDataMane, CIbook}. However, Schram and Anderson \cite{MySQLToNoSQL} state that having software systems that generate large amounts of data on a daily basis is not without consequence and likely introduces challenges. These include having the appropriate technical infrastructure and software in place to deal with data growth and also supporting different use cases for operating on collected data.
+In recent years, software companies have started to generate much more data about their development processes as a result of the wide adoption of continuous integration. Fowler \cite{FowlerCI} defines continuous integration (CI) as a software practice where developers in a team integrate work frequently, typically once a day or more \cite{FowlerCI}. Each integration is then verified by an automated build that runs tests, checks for code standard violations etc.\ \cite{FowlerCI}. According to Duval et.\ al \cite{CIbook}, the proposed benefits of using CI include an increased project visibility where problems like failing builds can be noticed instantly. Therefore, data generated through the use of CI is crucial to the success of the practice, since CI stresses the need for transparency, information sharing and information visualization \cite{FowlerCI, CIbook}. Collecting this data also opens up companies to analyze trends about their development processes in the long term \cite{CIbook, bigDataMane}. However, Schram and Anderson \cite{MySQLToNoSQL} state that having software systems that generate large amounts of data on a daily basis is not without consequence and likely introduces challenges. These include having the appropriate technical infrastructure and software in place to deal with data growth and also supporting different use cases for operating on collected data.
 
 The company Ericsson recently began adoption of continuous integration. At the company, there are two high level use cases for data collected from the continuous integration process. The first is to visualize newly created data, in real time, to developers. The second is to perform analytics, making use of historical data. This use case is of interest for the management staff as a means to quantify the effectiveness of the development process, to see if for example the proportion of successful builds increase over time.
 
@@ -10,11 +10,11 @@ The company Ericsson recently began adoption of continuous integration. At the c
 %This is an important part of lean \cite{lean}.
  %These use cases in combination with the monotonic growth of the total amount of collected data from the continuous integration process leads to a number of technical considerations when developing and evolving CIMS.
 
-Since the adoption of continuous integration at Ericsson, a number of software systems in support of this process has been put into use, including a web application developed internally called CIMS (Continuous Integration Management System). It has several instances, one for each of the larger software products being developed, and its main purpose is to address the first high level use case, namely to visualize data for developers. However, it is currently also used for the second use case.
+Since the adoption of continuous integration at Ericsson, several software systems in support of this process have been put into use, including a web application developed internally called CIMS (Continuous Integration Management System). It has several instances, one for each of the larger software products being developed, and its main purpose is to address the first high level use case, namely to visualize data for developers. However, it is currently also used for the second use case.
 
-Recently it has been observed that the amount of builds registered into CIMS is increasing steadily. At the same time the amount of test cases for each build is also increasing. The technology stack of CIMS was originally not made to scale with this kind of monotonic growth which in turn has introduced problems that impact performance, maintainability, changeability and other factors.
+Recently it has been observed that the amount of builds registered into CIMS is increasing. At the same time the amount of test cases for each build is also increasing. The technology stack of CIMS was originally not made to scale with this rate of monotonic growth which in turn has introduced problems that impact performance, maintainability, changeability and other factors.
 
-During the lifetime of CIMS, the influx of data for one of the larger developed software products can be seen in figure~\ref{fig:jeTrend}. The trend is hitherto increasing, with different factors involved in describing why it looks like it does. As the situation is today, the data growth this trend describes has caused a variety of problems with the current infrastructure supporting the continuous integration process.
+The influx of data for one of the larger developed software products are shown in figure~\ref{fig:jeTrend}. The trend is increasing, with different factors involved in describing why it looks like it does. As the situation is today, the data growth this trend describes has caused a variety of problems with the current infrastructure supporting the continuous integration process.
 
 %This figure clearly shows the trend in the data inflow of CIMS.
 \begin{figure}[h!]
@@ -24,14 +24,15 @@ During the lifetime of CIMS, the influx of data for one of the larger developed 
 \label{fig:jeTrend}
 \end{figure}
 
-One of these problems with the current implementation of CIMS stem from the need to evolve the system, specifically its data model and schemas. Currently, all system data is stored in a single relational database. For evolution to take place, all data must be migrated to match new versions of the system. At current rates of stored data, these migrations can take as much as a week's time to complete. Due to the long running migrations, the evolution of CIMS is impaired. The improvement of the continuous integration process is thereby on halt, leading to a decline in the ability of Ericsson to respond to market changes.
+One of these problems with the current implementation of CIMS stems from the need to evolve the system, specifically its data model and schemas. Currently, all system data is stored in a single relational database. For evolution to take place, all data must be migrated to match new versions of the system. At current rates of stored data, these migrations can take as much as a week's time to complete. Due to the long running migrations, the evolution of CIMS is impaired. This has halted efforts to improve the continuous integration process, thus reducing Ericsson's ability to respond to market changes.
 
 \section{Problem description}
 The context for this thesis is the intersection of continuous integration systems and data management. The focus is on the management of historical data and problems related to monotonic data growth. As such, we have broken down the research problem into two parts; the first part is to investigate different solutions to manage historical data that grows monotonically. The second part is to justify the value of having a solution by understanding how historical data in continuous integration systems can be used and what value it brings to the organization that possess the data. 
 
-Both these problems were addressed using a design research approach. This approach is described in detail in the following sections where we also present the research purpose and research questions.
+Both these problems were addressed using a design research approach. This approach is described in detail in the sections \ref{purpose}, \ref{method} and \ref{objectives} where we also present the research purpose and research questions.
 
 \section{Research Purpose}
+\label{purpose}
 The purpose of this study is to identify and evaluate solutions for management of historical data in a continuous integration system, more specifically, to evaluate the suitability of polyglot persistence (see section~\ref{sec:pp}) in that context. Based on the problem description and the research purpose, we ask the following research questions:
 
 RQ1: How can historical data in continuous integration systems be managed in the long term? \\
@@ -39,23 +40,24 @@ RQ2: What value can a solution to management of historical data in continuous in
 %RQ2: Does the value gained from solving the problem of monotonic growth in continuous integration systems outweigh the identified costs related to implementing a solution for the problem? \\
 
 \section{Research Method}
+\label{method}
 This thesis will be conducted using design research methods based on knowledge from \cite{DS, Peffers, DesignEval}. Design research is performed by building and evaluating artifacts that are designed with the purpose of addressing a specified business need or problem \cite{DS}. 
 
-Peffers et al.\ \cite{Peffers} describe an overall process for conducting design research which for the purposes of this thesis has been implemented as in figure~\ref{fig:peffer}. As can be noted in this figure, one important aspect of design research is its focus on iterative processes, where evaluation should inform reformulation of solution objectives and also give feedback to upcoming iterations of design and development. This part of Peffers process will be implemented by performing several iterations of design/development and demonstration/evaluation. If necessary, solution objectives can be changed as an increased understanding of the problem is gained. 
+Peffers et al.\ \cite{Peffers} describe an overall process for conducting design research which for the purposes of this thesis has been implemented as in figure~\ref{fig:peffer}. As can be noted in this figure, one important aspect of design research is its focus on iterative processes, where evaluation should inform reformulation of solution objectives and also give feedback to upcoming iterations of design and development. This part of the process will be implemented by performing several iterations of design/development and demonstration/evaluation. If necessary, solution objectives can be changed as an increased understanding of the problem is gained. 
 
 According to \cite{Peffers}, there are several possible entry points for a design research study. In our case the entry point is an objective-centered solution, since the need for the study originated from an industrial problem that could be addressed by constructing an artifact.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.7\pdfpagewidth]{figure/Peffer.png}
-\caption{Peffers process}
+\caption{The design research process as described in \cite{Peffers}.}
 \label{fig:peffer}
 \end{figure}
 
-In this thesis, our implementation of Peffers process laid out the overall framework used to design the study. First, we studied and defined the problem in more detail in collaboration with the CIMS development team. After this, we proceeded with the formulation of solution objectives which set the scope for this thesis. During this process, an overview of related work was written.
+In this thesis, our implementation of the process described by Peffers et al.\ \cite{Peffers} laid out the overall framework used to design the study. First, we studied and defined the problem in more detail in collaboration with the CIMS development team. After this, we proceeded with the formulation of solution objectives which set the scope for this thesis. During this process, an overview of related work was written.
 
 With solution objectives in place, work began on the two bigger phases, namely design/development and evaluation. In a given iteration of design/development, an artifact in the form of a prototype was either built from scratch or further developed.
 
-For the evaluation process, options given by \cite{DesignEval} were used to define properties of the artifact, its purpose and actual approaches used for evaluation. The choices made can be seen in figure~\ref{fig:matrix}.
+For the evaluation process, options given by \cite{DesignEval} were used to define properties of the artifact, its purpose and actual approaches used for evaluation. The choices made are shown in figure~\ref{fig:matrix}.
 
 Further explanations of some of these choices are warranted; the goal of the evaluation is to gather knowledge about the problem and its domain so as to put upcoming decisions made at Ericsson on a rational basis. As such, evaluation goes in line with the knowledge function described in \cite{DesignEval}. 
 
@@ -66,27 +68,30 @@ Given that the thesis was conducted in collaboration with Ericsson, the artifact
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.7\pdfpagewidth]{figure/eval.png}
-\caption{Evaluation matrix}
+\caption{Evaluation matrix. Choices made are marked in bold and colored.}
 \label{fig:matrix}
 \end{figure}
 
 
 \section{Solution objectives}
+\label{objectives}
 In adherence with the design research process, a set of objectives that define a successful solution has been defined in collaboration with the CIMS development team. The main objective is to develop an archive system that physically separates stale data from live data in order to further support the evolution of CIMS.
 
-While stale data is not accessed often, it is still useful for analytics purposes and to respond to trouble reports from customers running older versions of Ericsson products. Therefore a secondary objective is to retain as much functionality as possible in terms of queries on the archived portion of the data. The specific queries that the archive should support has been defined through discussion with the CIMS development team and the metrics team.
+While stale data is not accessed often, it is still useful for analytics purposes and to respond to trouble reports from customers running older versions of Ericsson products. Therefore a secondary objective is to retain as much functionality as possible in terms of queries on the archived portion of the data. The specific queries that the archive should support have been defined through discussion with the CIMS development team and the metrics team.
 
 For the combination of CIMS and the archive system to be future proof it must also be able to scale better with overall data size than CIMS currently does. This ensures that the problem is simply not pushed further into the future but rather solved in its entirety.
 
-In summation, 3 main objectives have been identified. They are as follows;\\
-1. Develop an archive solution that physically separates live from stale data.\\
-2. Retain a set of important queries on archived data.\\
-3. Introduce long term scalability. \\
+In summary, 3 main objectives have been identified. They are as follows;
+\begin{enumerate}
+\item Develop an archive solution that physically separates live from stale data.
+\item Retain a set of important queries on archived data.
+\item Introduce long term scalability.
+\end{enumerate}
 
 %3. Handle structural variation on incoming data to the archive.\\
 %Physical separation of live and stale data means that the storage solution for archived data must be flexible enough to handle structure variation on incoming data. If it does not then the problem of long running migrations is not solved but rather moved to the data store of the archive. 
 
-\section{Document structure}
+\section{Report structure}
 This report is structured in the following way; In chapter~\ref{chap:background} the background and related work is described. Chapter~\ref{chap:domain} describes the domain of CIMS and the business context in more detail. In chapter~\ref{chap:design} a description is given of how the artifact addressing the identified problem was designed and implemented.
 This is followed in chapter~\ref{chap:eval} by a description of how the artifact was evaluated. Results and discussion of this evaluation are given in chapter~\ref{chap:results}. The report is then wrapped up in chapter~\ref{chap:conclusion} with conclusions.
 
